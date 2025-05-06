@@ -5,6 +5,7 @@ import {
   deleteDoc, 
   doc, 
   getDoc, 
+  setDoc, 
   getDocs, 
   query,
   where,
@@ -94,7 +95,13 @@ export class FirestoreService {
   static async updateUser(userId: string, userData: Partial<User>): Promise<boolean> {
     try {
       const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, userData);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        await updateDoc(userRef, userData);
+      } else {
+        // If the document does not exist, create it
+        await setDoc(userRef, userData);
+      }
       return true;
     } catch (error) {
       console.error('Error updating user:', error);

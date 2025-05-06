@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo 1.png";
 import burger from "../../assets/burger-removebg-preview.png";
 import bg from "../../assets/bg.png";
+import LoginForm from '../components/LoginForm';
 
 const AboutUsOverlay = ({ onClose }: { onClose: () => void }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
@@ -67,33 +68,21 @@ const Landing = () => {
         <div className="flex-1 flex flex-col justify-center items-center bg-orange-100/90 p-10 md:p-16">
           <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 flex flex-col gap-8 border-4 border-yellow-200">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Log in</h2>
-            <div className="flex flex-col gap-5">
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </span>
-                <input type="text" placeholder="Username" className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
-              </div>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
-                  <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </span>
-                <input type="password" placeholder="Password" className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
-              </div>
-              <button
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg py-3 text-xl shadow-md transition-all active:scale-95"
-                onClick={() => navigate("/pin")}
-              >
-                Log In
-              </button>
-              <div className="flex flex-col gap-2 mt-2 text-xs text-gray-600 items-center">
-                <span>Forgot your password? <a href="#" className="text-blue-800 font-semibold hover:underline">Click here</a> to reset you password</span>
-                <hr className="w-full border-gray-300 my-2" />
-                <label className="flex items-center gap-2 mt-2">
-                  <input type="checkbox" className="accent-orange-500 w-4 h-4" />
-                  <span>By continuing, you agree with our <a href="#" className="text-blue-800 font-semibold hover:underline">Terms and Conditions</a></span>
-                </label>
-              </div>
+            <LoginForm onSuccess={(user) => {
+              const userData = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+              };
+              navigate('/pin', { state: { user: userData } });
+            }} />
+            <div className="flex flex-col gap-2 mt-2 text-xs text-gray-600 items-center">
+              <span>Forgot your password? <a href="#" className="text-blue-800 font-semibold hover:underline">Click here</a> to reset you password</span>
+              <hr className="w-full border-gray-300 my-2" />
+              <label className="flex items-center gap-2 mt-2">
+                <input type="checkbox" className="accent-orange-500 w-4 h-4" />
+                <span>By continuing, you agree with our <a href="#" className="text-blue-800 font-semibold hover:underline">Terms and Conditions</a></span>
+              </label>
             </div>
           </div>
         </div>
