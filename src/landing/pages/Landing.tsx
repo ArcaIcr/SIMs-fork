@@ -33,72 +33,72 @@ const Landing = () => {
   const navigate = useNavigate();
   const [showAbout, setShowAbout] = useState(false);
 
-  return (  
+  return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-center relative" style={{ backgroundImage: `url(${bg})` }}>
       {/* Overlay for background blur */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm z-0" />
-      <div className="relative z-10 flex flex-col md:flex-row w-full max-w-6xl mx-auto shadow-2xl rounded-3xl overflow-hidden">
+      <div className="absolute inset-0 bg-yellow-100/70 backdrop-blur-sm z-0" />
+      <div className="relative z-10 flex flex-col md:flex-row w-full max-w-6xl mx-auto shadow-2xl rounded-3xl overflow-hidden border-8 border-yellow-200" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
         {/* Left: Branding */}
-        <div className="flex-1 flex flex-col justify-center items-start bg-white/80 p-10 md:p-16 gap-6">
+        <div className="flex-1 flex flex-col justify-center items-start bg-transparent p-10 md:p-16 gap-6">
           {/* Logo Image */}
-          <div className="w-20 h-20 mb-6">
-            <img src={logo} alt="Logo" className="w-full h-full object-contain drop-shadow-lg" />
+          <div className="w-24 h-24 mb-6 bg-yellow-300 rounded-2xl flex items-center justify-center shadow-lg border-4 border-yellow-400">
+            <img src={logo} alt="Logo" className="w-16 h-16 object-contain" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-brown-800 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-extrabold text-brown-800 leading-tight drop-shadow-lg">
             Smart Inventory<br />
             Management<br />
             System
           </h1>
-          <p className="text-brown-700 text-xl font-medium mt-2">
-            Doble sa Busog, Doble sa Sulit
-          </p>
+          <p className="text-brown-700 text-2xl font-medium mt-2 drop-shadow">Doble sa Busog, Doble sa Sulit</p>
           <button
-            className="mt-6 bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold rounded-full px-8 py-2 shadow-md transition-all"
+            className="mt-8 bg-orange-400 hover:bg-orange-500 text-white text-xl font-semibold rounded-full px-10 py-2 shadow-lg border border-orange-600 transition-all active:scale-95"
             onClick={() => setShowAbout(true)}
           >
             About us
           </button>
-          {/* Food Image */}
-          <div className="flex gap-4 mt-10">
-            <img src={burger} alt="Burger" className="w-24 h-24 object-contain rounded-xl shadow-md bg-white" />
-            <div className="w-24 h-24 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 font-bold">Food 2</div>
-            <div className="w-24 h-24 bg-gray-200 rounded-xl flex items-center justify-center text-gray-400 font-bold">Food 3</div>
+          {/* Food Images */}
+          <div className="flex gap-4 mt-12 items-end">
+            <img src={burger} alt="Burger" className="w-36 h-36 object-contain rounded-xl shadow-xl bg-white -mb-4" />
+            <div className="w-32 h-32 bg-yellow-200 rounded-xl flex items-center justify-center text-yellow-700 font-bold shadow-xl border-2 border-yellow-400 -mb-2">Fries</div>
+            <div className="w-32 h-28 bg-yellow-100 rounded-xl flex items-center justify-center text-yellow-600 font-bold shadow-xl border-2 border-yellow-300">Other Food</div>
           </div>
         </div>
         {/* Right: Login Form */}
         <div className="flex-1 flex flex-col justify-center items-center bg-orange-100/90 p-10 md:p-16">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Log in</h2>
-            <div className="flex flex-col gap-4">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 flex flex-col gap-8 border-4 border-yellow-200">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Log in</h2>
+            <div className="flex flex-col gap-5">
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 </span>
-                <input type="text" placeholder="Username" className="pl-10 pr-4 py-2 w-full bg-orange-50 border border-orange-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                <input type="text" placeholder="Username" className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
               </div>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-400">
-                  <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
+                  <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </span>
-                <input type="password" placeholder="Password" className="pl-10 pr-4 py-2 w-full bg-orange-50 border border-orange-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400" />
+                <input type="password" placeholder="Password" className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
               </div>
               <button
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-md py-2 text-lg transition-all"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg py-3 text-xl shadow-md transition-all active:scale-95"
                 onClick={() => navigate("/pin")}
               >
-                Log in
+                Log In
               </button>
               <div className="flex flex-col gap-2 mt-2 text-xs text-gray-600 items-center">
-                <span>Forgot your password? <a href="#" className="text-blue-800 font-semibold hover:underline">Click here</a> to reset your password</span>
+                <span>Forgot your password? <a href="#" className="text-blue-800 font-semibold hover:underline">Click here</a> to reset you password</span>
+                <hr className="w-full border-gray-300 my-2" />
                 <label className="flex items-center gap-2 mt-2">
-                  <input type="checkbox" className="accent-orange-500" />
-                  By continuing, you agree with our <a href="#" className="text-blue-800 font-semibold hover:underline">Terms and Conditions</a>
+                  <input type="checkbox" className="accent-orange-500 w-4 h-4" />
+                  <span>By continuing, you agree with our <a href="#" className="text-blue-800 font-semibold hover:underline">Terms and Conditions</a></span>
                 </label>
               </div>
             </div>
           </div>
         </div>
       </div>
+      {/* Optionally, add a wooden table foreground here if image is available */}
       {showAbout && <AboutUsOverlay onClose={() => setShowAbout(false)} />}
     </div>
   );

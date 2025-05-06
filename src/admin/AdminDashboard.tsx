@@ -35,6 +35,7 @@ export default function AdminDashboard() {
   const [newDisplayName, setNewDisplayName] = useState('');
   const [newRole, setNewRole] = useState<'MANAGER' | 'STAFF'>('MANAGER');
   const [newBranchId, setNewBranchId] = useState('');
+  const [newPin, setNewPin] = useState('');
   const [addError, setAddError] = useState('');
   const [addSuccess, setAddSuccess] = useState('');
 
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setAddError('');
     setAddSuccess('');
-    if (!newEmail || !newPassword || !newDisplayName || !newBranchId) {
+    if (!newEmail || !newPassword || !newDisplayName || !newBranchId || !newPin) {
       setAddError('All fields are required.');
       return;
     }
@@ -112,11 +113,12 @@ export default function AdminDashboard() {
           displayName: newDisplayName,
           role: newRole,
           branchId: newBranchId,
+          pin: newPin,
         });
         setAddSuccess('Account created successfully!');
         setTimeout(() => {
           setShowAddModal(false);
-          setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('MANAGER'); setNewBranchId(''); setAddSuccess('');
+          setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('MANAGER'); setNewBranchId(''); setNewPin(''); setAddSuccess('');
           fetchUsers(selectedBranch || undefined);
         }, 1200);
       } else {
@@ -183,6 +185,10 @@ export default function AdminDashboard() {
                     <option key={branch.id} value={branch.id}>{branch.name}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium">PIN</label>
+                <input type="password" value={newPin} onChange={e => setNewPin(e.target.value)} required maxLength={6} minLength={4} pattern="[0-9]*" inputMode="numeric" className="mt-1 block w-full border px-3 py-2 rounded" placeholder="Enter 4-6 digit PIN" />
               </div>
               <div>
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Create Account</button>
