@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import logo from "../../assets/logo 1.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FirestoreService, User as FirestoreUser, Branch as FirestoreBranch } from '../../services/firestoreService';
 
 const placeholder =
@@ -10,6 +10,8 @@ const PIN_LENGTH = 6;
 
 const PinEntry = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const loggedInUser = location.state?.user;
   const [users, setUsers] = useState<FirestoreUser[]>([]);
   const [branches, setBranches] = useState<FirestoreBranch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState<string>("");
@@ -28,16 +30,40 @@ const PinEntry = () => {
           : FirestoreService.getAll<FirestoreUser>('users'),
       ]);
       setBranches(branchList);
-      setUsers(userList.filter(user => user.role !== 'ADMIN'));
+
+      // Remove duplicates by email and filter out users with no email
+      const seen = new Set();
+      const filtered = userList
+        .filter(user => user.role !== 'ADMIN' && user.email)
+        .filter(user => {
+          if (seen.has(user.email)) return false;
+          seen.add(user.email);
+          return true;
+        });
+
+      setUsers(filtered);
       setLoading(false);
     };
     fetchData();
   }, [selectedBranch]);
 
+  // Only allow the logged-in user to be selected
+  useEffect(() => {
+    if (loggedInUser) {
+      const match = users.find(
+        u => u.email === loggedInUser.email || u.id === loggedInUser.uid || u.id === loggedInUser.id
+      );
+      setSelectedUser(match || null);
+    }
+  }, [users, loggedInUser]);
+
   const handleUserClick = (user: FirestoreUser) => {
-    setSelectedUser(user);
-    setPin("");
-    setError("");
+    // Only allow selecting the logged-in user
+    if (user.email === loggedInUser?.email || user.id === loggedInUser?.uid || user.id === loggedInUser?.id) {
+      setSelectedUser(user);
+      setPin("");
+      setError("");
+    }
   };
 
   const handleNumpad = (val: string) => {
@@ -91,26 +117,30 @@ const PinEntry = () => {
               ) : users.length === 0 ? (
                 <div className="text-center text-gray-400">No users found.</div>
               ) : (
-                users.map((user, idx) => (
-                  <div
-                    key={user.id || idx}
-                    className={`flex items-center gap-4 border-b pb-2 last:border-b-0 last:pb-0 cursor-pointer transition ${selectedUser?.id === user.id ? 'bg-orange-100' : ''}`}
-                    onClick={() => handleUserClick(user)}
-                  >
-                    <img
-                      src={placeholder}
-                      alt={user.displayName || user.email}
-                      className="w-12 h-12 rounded-lg object-cover border"
-                    />
-                    <div>
-                      <span className={`text-xs font-bold ${user.role === 'MANAGER' ? 'text-orange-600' : 'text-gray-500'}`}>{user.role}</span>
-                      <div className="font-medium text-gray-800 leading-tight">{user.displayName || user.email}</div>
-                      {user.branchId && (
-                        <div className="text-xs text-gray-400">Branch: {branches.find(b => b.id === user.branchId)?.name || user.branchId}</div>
-                      )}
+                users.map((user, idx) => {
+                  const isAllowed = user.email === loggedInUser?.email || user.id === loggedInUser?.uid || user.id === loggedInUser?.id;
+                  const key = user.id ? `${user.id}-${idx}` : `user-${idx}`;
+                  return (
+                    <div
+                      key={key}
+                      className={`flex items-center gap-4 border-b pb-2 last:border-b-0 last:pb-0 transition ${isAllowed ? 'cursor-pointer hover:bg-orange-100' : 'opacity-50 cursor-not-allowed'} ${selectedUser?.id === user.id ? 'bg-orange-100' : ''}`}
+                      onClick={() => isAllowed && handleUserClick(user)}
+                    >
+                      <img
+                        src={placeholder}
+                        alt={user.displayName || user.email}
+                        className="w-12 h-12 rounded-lg object-cover border"
+                      />
+                      <div>
+                        <span className={`text-xs font-bold ${user.role === 'MANAGER' ? 'text-orange-600' : 'text-gray-500'}`}>{user.role}</span>
+                        <div className="font-medium text-gray-800 leading-tight">{user.displayName || user.email}</div>
+                        {user.branchId && (
+                          <div className="text-xs text-gray-400">Branch: {branches.find(b => b.id === user.branchId)?.name || user.branchId}</div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
