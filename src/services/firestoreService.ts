@@ -14,9 +14,121 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
+// Branch Interface
+export interface Branch {
+  id?: string;
+  name: string;
+  location: string;
+  managerId?: string;
+}
+
+// User Interface
+export interface User {
+  id?: string;
+  email: string;
+  displayName?: string;
+  role: 'ADMIN' | 'MANAGER' | 'STAFF';
+  branchId?: string;
+  lastLogin?: Date;
+}
+
 export class FirestoreService {
+  // Branch Management Methods
+  static async createBranch(branchData: Branch): Promise<string | null> {
+    try {
+      const branchRef = await addDoc(collection(db, 'branches'), branchData);
+      return branchRef.id;
+    } catch (error) {
+      console.error('Error creating branch:', error);
+      return null;
+    }
+  }
+
+  static async updateBranch(branchId: string, branchData: Partial<Branch>): Promise<boolean> {
+    try {
+      const branchRef = doc(db, 'branches', branchId);
+      await updateDoc(branchRef, branchData);
+      return true;
+    } catch (error) {
+      console.error('Error updating branch:', error);
+      return false;
+    }
+  }
+
+  static async deleteBranch(branchId: string): Promise<boolean> {
+    try {
+      const branchRef = doc(db, 'branches', branchId);
+      await deleteDoc(branchRef);
+      return true;
+    } catch (error) {
+      console.error('Error deleting branch:', error);
+      return false;
+    }
+  }
+
+  static async getBranches(): Promise<Branch[]> {
+    try {
+      const branchesCollection = collection(db, 'branches');
+      const branchSnapshot = await getDocs(branchesCollection);
+      return branchSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Branch));
+    } catch (error) {
+      console.error('Error fetching branches:', error);
+      return [];
+    }
+  }
+
+  // User Management Methods
+  static async createUser(userData: User): Promise<string | null> {
+    try {
+      const userRef = await addDoc(collection(db, 'users'), userData);
+      return userRef.id;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return null;
+    }
+  }
+
+  static async updateUser(userId: string, userData: Partial<User>): Promise<boolean> {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, userData);
+      return true;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return false;
+    }
+  }
+
+  static async deleteUser(userId: string): Promise<boolean> {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await deleteDoc(userRef);
+      return true;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
+  }
+
+  static async getUsersByBranch(branchId: string): Promise<User[]> {
+    try {
+      const usersCollection = collection(db, 'users');
+      const q = query(usersCollection, where('branchId', '==', branchId));
+      const userSnapshot = await getDocs(q);
+      return userSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as User));
+    } catch (error) {
+      console.error('Error fetching users by branch:', error);
+      return [];
+    }
+  }
   // Generic method to add a document to a collection
-  static async create<T>(collectionName: string, data: T): Promise<string | null> {
+  static async create<T extends Record<string, any>>(collectionName: string, data: T): Promise<string | null> {
     try {
       const docRef = await addDoc(collection(db, collectionName), data);
       return docRef.id;

@@ -7,6 +7,7 @@ import {
   User
 } from 'firebase/auth';
 import { auth } from '../firebase';
+import { FirestoreService } from './firestoreService';
 
 interface SignUpCredentials {
   email: string;
@@ -42,7 +43,18 @@ export const authService = {
   signIn: async ({ email, password }: SignInCredentials): Promise<User | null> => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
+      const user = userCredential.user;
+      
+      // Update last login for the user
+      if (user) {
+        await FirestoreService.updateUser(user.uid, { 
+          lastLogin: new Date(),
+          // Optional: Add role-based logic here
+          role: email === 'admin@sims.com' ? 'ADMIN' : 'STAFF'
+        });
+      }
+      
+      return user;
     } catch (error) {
       console.error('Sign In Error:', error);
       return null;
@@ -72,5 +84,11 @@ export const authService = {
   // Get Current User
   getCurrentUser: (): User | null => {
     return auth.currentUser;
+  },
+
+  // Check if current user is admin
+  isAdmin: (): boolean => {
+    const currentUser = auth.currentUser;
+    return currentUser?.email === 'admin@sims.com' || false;
   }
 };

@@ -6,6 +6,9 @@ import Settings from "../dashboard/Settings";
 import Notifications from "../dashboard/Notifications";
 import Sales from "../dashboard/Sales";
 import AboutUs from "../dashboard/AboutUs";
+import AdminDashboard from "../admin/AdminDashboard";
+import AdminLogin from "../admin/AdminLogin";
+import AdminSignUp from "../admin/AdminSignUp";
 
 function App() {
     return (
@@ -18,6 +21,9 @@ function App() {
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/sales" element={<Sales />} />
                 <Route path="/about" element={<AboutUs />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/adminlogin" element={<AdminLogin />} />
+                <Route path="/adminsignup" element={<AdminSignUp />} />
             </Routes>
         </Router>
     )
