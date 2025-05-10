@@ -59,7 +59,7 @@ const TermsAndConditionsOverlay = ({ onClose }: { onClose: () => void }) => (
       <h3 className="font-semibold text-brown-800 mb-2">11. Contact Information</h3>
       <p className="mb-4 text-brown-700">For any questions, contact us at [Your Contact Information].</p>
 
-      <p className="text-sm text-brown-600">Effective Date: [Your Effective Date]</p>
+      <p className="text-sm text-brown-600">Effective Date: </p>
     </div>
   </div>
 );
