@@ -1,7 +1,18 @@
 import logo from "../assets/logo 1.png";
 import { useNavigate } from "react-router-dom";
-// You will need to import your product images here, e.g.:
-// import minute_burger from "../assets/minute_burger.png";
+import bigtime_baconcheese from "../assets/bigtime-baconcheese.png";
+import bigtime_beefshawarma from "../assets/bigtime-beefshawarma.png";
+import bigtime_blackpepper from "../assets/bigtime-blackpepper.png";
+import bigtime_chimichurri from "../assets/bigtime-chimichurri.png";
+import bigtime_veggiechicken from "../assets/bigtime-veggiechicken.png";
+import bigtime_premiumsteak from "../assets/bigtime-premiumsteak.png";
+import bigtime_roastedsesame from "../assets/bigtime-roastedsesame.png";
+import sulit_minute from "../assets/sulit-minute.png";
+import sulit_doubleminute from "../assets/sulit-doubleminute.png";
+import sulit_cheesy from "../assets/sulit-cheesy.png";
+import sulit_doublecheesy from "../assets/sulit-doublecheesy.png";
+import sulit_chilicheesy from "../assets/sulit-chilicheesy.png";
+import sulit_doublechilicheesy from "../assets/sulit-doublechilicheesy.png";
 
 const categories = [
   "BIGTIME SANDWICHES",
@@ -24,21 +35,21 @@ type Product = {
 
 const salesData: Record<Category, Product[]> = {
   "BIGTIME SANDWICHES": [
-    { name: "Minute Burger", img: "", price: 42, revenue: 714, qty: 17 },
-    { name: "Double Minute Burger", img: "", price: 65, revenue: 260, qty: 4 },
-    { name: "Cheesy Burger", img: "", price: 52, revenue: 780, qty: 15 },
-    { name: "Double Cheesy Burger", img: "", price: 81, revenue: 162, qty: 2 },
-    { name: "Chili Cheesy Burger", img: "", price: 52, revenue: 92, qty: 1 },
-    { name: "Double Chili Cheesy Burger", img: "", price: 81, revenue: 0, qty: 0 },
+    { name: "Bacon Cheese Burger", img: bigtime_baconcheese, price: 97, revenue: 291, qty: 3 },
+    { name: "Beef Shawarma Burger", img: bigtime_beefshawarma, price: 92, revenue: 460, qty: 5 },
+    { name: "Black Pepper Burger", img: bigtime_blackpepper, price: 90, revenue: 180, qty: 2 },
+    { name: "Chimichuri Chicken Burger", img: bigtime_chimichurri, price: 101, revenue: 101, qty: 1 },
+    { name: "50/50 Veggie Chicken Burger", img: bigtime_veggiechicken, price: 87, revenue: 87, qty: 1 },
+    { name: "Premium Steak Burger", img: bigtime_premiumsteak, price: 142, revenue: 0, qty: 0 },
+    { name: "Roasted Sesame Burger", img: bigtime_roastedsesame, price: 95, revenue: 0, qty: 0 },
   ],
   "SULIT SANDWICHES": [
-    { name: "Bacon Cheese Burger", img: "", price: 97, revenue: 291, qty: 3 },
-    { name: "Beef Shawarma Burger", img: "", price: 92, revenue: 460, qty: 5 },
-    { name: "Black Pepper Burger", img: "", price: 90, revenue: 180, qty: 2 },
-    { name: "Chimichuri Chicken Burger", img: "", price: 101, revenue: 101, qty: 1 },
-    { name: "50/50 Veggie Chicken Burger", img: "", price: 87, revenue: 87, qty: 1 },
-    { name: "Premium Steak Burger", img: "", price: 142, revenue: 0, qty: 0 },
-    { name: "Roasted Sesame Burger", img: "", price: 95, revenue: 0, qty: 0 },
+    { name: "Minute Burger", img: sulit_minute, price: 42, revenue: 714, qty: 17 },
+    { name: "Double Minute Burger", img: sulit_doubleminute, price: 65, revenue: 260, qty: 4 },
+    { name: "Cheesy Burger", img: sulit_cheesy, price: 52, revenue: 780, qty: 15 },
+    { name: "Double Cheesy Burger", img: sulit_doublecheesy, price: 81, revenue: 162, qty: 2 },
+    { name: "Chili Cheesy Burger", img: sulit_chilicheesy, price: 52, revenue: 92, qty: 1 },
+    { name: "Double Chili Cheesy Burger", img: sulit_doublechilicheesy, price: 81, revenue: 0, qty: 0 },
   ],
   "CHICKEN TIME SANDWICHES": [
     { name: "Chicken Time", img: "", price: 51, revenue: 255, qty: 5 },
