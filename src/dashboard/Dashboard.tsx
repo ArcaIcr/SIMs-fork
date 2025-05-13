@@ -17,74 +17,54 @@ const stockData = [
   { name: "DMB Buns", status: "OUT OF STOCK", color: "text-red-600", bar: "border-red-400" },
 ];
 
+import StaffDashboard from "./StaffDashboard";
+import ManagerDashboard from "./ManagerDashboard";
+import { useEffect, useState } from "react";
+import { auth } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-  // For demo, fallback to JM/Manager/Branch if no user info
-  const user = location.state?.user || { displayName: "JM", role: "Manager", branch: "Branch" };
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <div className="min-h-screen bg-[#fdf6ec] p-8 font-sans">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <img src={logo} alt="Logo" className="w-16 h-16 object-contain drop-shadow" />
-          <div>
-            <div className="text-2xl font-bold text-brown-800">Hello, {user.displayName || "Manager"}!</div>
-            <div className="text-sm text-brown-600 font-medium">{user.role || "Manager"} | {user.branch || "Branch"}</div>
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <button className="w-12 h-12 rounded-full bg-white shadow flex items-center justify-center hover:bg-orange-50 transition">
-            <span className="material-icons text-brown-700 text-2xl">notifications</span>
-          </button>
-          <button className="w-12 h-12 rounded-full bg-white shadow flex items-center justify-center hover:bg-orange-50 transition">
-            <span className="material-icons text-brown-700 text-2xl">settings</span>
-          </button>
-        </div>
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          if (userDoc.exists()) {
+            setUser({ ...userDoc.data(), displayName: currentUser.displayName, email: currentUser.email });
+          } else {
+            setUser({ displayName: currentUser.displayName, email: currentUser.email, role: "staff" }); // fallback
+          }
+        } else if (location.state?.user) {
+          setUser(location.state.user);
+        } else {
+          setUser({ displayName: "JM", role: "Manager", branch: "Branch" }); // fallback for dev
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUser();
+  }, [location.state]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
       </div>
-      <hr className="border-brown-200 mb-8" />
-      {/* Main Content */}
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Left: Common Sales */}
-        <div className="flex-1">
-          <div className="text-2xl font-bold text-brown-800 mb-4">Common Sales</div>
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
-            {salesData.map((item, idx) => (
-              <div key={item.name} className="mb-5">
-                <div className="flex justify-between text-lg font-medium text-brown-800">
-                  <span>{item.name}</span>
-                  <span>{item.value}</span>
-                </div>
-                <div className="h-3 bg-gray-200 rounded-full mt-2 mb-1">
-                  <div className="h-3 rounded-full bg-orange-400 transition-all" style={{ width: `${Math.min(item.value * 6, 100)}%` }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Right: Tabs and Stock */}
-        <div className="flex-1 flex flex-col gap-8">
-          <div className="flex gap-6 mb-2 justify-center">
-            <button className="px-10 py-4 bg-white rounded-full shadow text-xl font-semibold border border-gray-200 hover:bg-orange-50 transition focus:outline-none focus:ring-2 focus:ring-orange-300">Sales</button>
-            <button className="px-10 py-4 bg-white rounded-full shadow text-xl font-semibold border border-gray-200 hover:bg-orange-50 transition focus:outline-none focus:ring-2 focus:ring-orange-300">Suppliers</button>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-brown-800 mb-4">Stock</div>
-            <div className="bg-white rounded-2xl shadow-xl p-6 border-4 border-orange-200">
-              {stockData.map((item, idx) => (
-                <div key={item.name} className="flex items-center justify-between mb-4 last:mb-0 p-3 rounded-xl bg-orange-50 border-l-4 shadow-sm transition-all border-orange-300">
-                  <div className="flex flex-col">
-                    <span className={`font-bold text-lg ${item.color}`}>{item.name}</span>
-                    <span className="text-xs text-gray-500">Today, 7:14</span>
-                  </div>
-                  <span className={`font-semibold text-base ${item.color}`}>{item.status}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  }
+
+  if (user?.role && user.role.toLowerCase() === "staff") {
+    return <StaffDashboard user={user} />;
+  }
+
+  // Manager/Admin dashboard (now as separate component)
+  return <ManagerDashboard user={user} />;
 }

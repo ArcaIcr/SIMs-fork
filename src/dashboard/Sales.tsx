@@ -1,4 +1,4 @@
-import logo from "../assets/logo 1.png";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from 'lucide-react';
 import { Settings } from 'lucide-react';
@@ -100,8 +100,6 @@ const salesData: Record<Category, Product[]> = {
     { name: "Supreme Cheese", img: extra_supreme, price: 16, revenue: 676, qty: 13 },
   ],
 };
-
-import React, { useState } from "react";
 
 export default function Sales() {
   const navigate = useNavigate();
