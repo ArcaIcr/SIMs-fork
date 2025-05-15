@@ -74,11 +74,17 @@ const PinEntry = () => {
       if (selectedUser && pin.length === PIN_LENGTH) {
         // Check PIN
         if ((selectedUser as any).pin === pin) {
-          navigate("/dashboard");
-        } else {
-          setError("Incorrect PIN. Please try again.");
-          setPin("");
-        }
+  if (selectedUser.role === 'MANAGER') {
+    navigate('/dashboard/manager');
+  } else if (selectedUser.role === 'STAFF') {
+    navigate('/dashboard/staff/page/dashboard');
+  } else {
+    navigate('/dashboard'); // fallback for other roles
+  }
+} else {
+  setError("Incorrect PIN. Please try again.");
+  setPin("");
+}
       }
       return;
     }
