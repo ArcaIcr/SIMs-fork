@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from "../landing/pages/Landing";
 import PinEntry from "../landing/pages/PinEntry";
-import ManagerDashboard from "../dashboard/manager/pages/dashboard";
-import ManagerSales from "../dashboard/manager/pages/sales";
-import InventoryPage from "../dashboard/manager/pages/inventory";
+import StaffDashboard from "../dashboard/staff/pages/dashboard";
+import StaffSales from "../dashboard/staff/pages/sales";
+import StaffInventory from "../dashboard/staff/pages/inventory";
 import AboutUs from "../dashboard/AboutUs";
 import AdminDashboard from "../admin/AdminDashboard";
 import AdminLogin from "../admin/AdminLogin";
@@ -15,10 +15,10 @@ function App() {
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/pin" element={<PinEntry />} />
-                <Route path="/dashboard/manager" element={<ManagerDashboard />} />
-                <Route path="/dashboard/manager/dashboard" element={<ManagerDashboard />} />
-                <Route path="/dashboard/manager/sales" element={<ManagerSales />} />
-                <Route path="/dashboard/manager/inventory" element={<InventoryPage />} />
+                <Route path="/dashboard/staff" element={<StaffDashboard />} />
+                <Route path="/dashboard/staff/dashboard" element={<StaffDashboard />} />
+                <Route path="/dashboard/staff/sales" element={<StaffSales />} />
+                <Route path="/dashboard/staff/inventory" element={<StaffInventory />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />

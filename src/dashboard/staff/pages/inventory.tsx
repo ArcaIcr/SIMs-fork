@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ManagerNavbar from '../components/ManagerNavbar';
+import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -43,12 +43,12 @@ const InventoryPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFF7E6] flex flex-col">
-      <ManagerNavbar user={user} />
+      <StaffNavbar user={user} />
       <div className="px-8 py-6">
         <div className="flex items-center mb-4">
           <button
             className="mr-4 p-2 rounded-full bg-[#FFF3E0] hover:bg-[#F9C97B] text-[#B77B2B] text-2xl shadow"
-            onClick={() => navigate('/dashboard/manager')}
+            onClick={() => navigate('/dashboard/staff')}
             aria-label="Back"
           >
             &#8592;

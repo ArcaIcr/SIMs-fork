@@ -77,7 +77,7 @@ const PinEntry = () => {
   if (selectedUser.role === 'MANAGER') {
     navigate('/dashboard/manager');
   } else if (selectedUser.role === 'STAFF') {
-    navigate('/dashboard/staff/page/dashboard');
+    navigate('/dashboard/staff');
   } else {
     navigate('/dashboard'); // fallback for other roles
   }
