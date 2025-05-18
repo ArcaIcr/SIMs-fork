@@ -139,11 +139,16 @@ const SettingsPage = () => {
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, userData);
       showToast('Profile updated successfully!', 'success');
-      await addNotification({
-        message: 'Your profile settings have been updated successfully',
-        type: 'success',
-        userId: currentUser.uid
-      });
+      if (user?.branchId && user?.displayName) {
+        await addNotification({
+          message: 'updated their profile information',
+          type: 'info',
+          branchId: user.branchId,
+          actorName: user.displayName,
+          isProfileUpdate: true,
+          actorId: user.email
+        });
+      }
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Failed to update profile.', 'error');
     }

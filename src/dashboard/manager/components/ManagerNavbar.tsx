@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { fetchNotifications, markAllNotificationsRead, Notification } from '../../../models/notificationModel';
+import { fetchNotifications, markAllNotificationsRead, clearNotifications, Notification } from '../../../models/notificationModel';
 
 const ManagerNavbar: React.FC = () => {
   const { user } = useUser();
@@ -30,6 +30,12 @@ const ManagerNavbar: React.FC = () => {
   };
 
   const handleCloseNotifications = () => setShowNotifications(false);
+
+  const handleClearNotifications = async () => {
+    await clearNotifications(user?.email);
+    const notifs = await fetchNotifications(user?.email);
+    setNotifications(notifs);
+  };
 
   return (
     <div className="flex items-center justify-between px-8 py-4 bg-[#FFF7E6] border-b-2 border-[#E2C089] shadow-md relative">
@@ -87,13 +93,14 @@ const ManagerNavbar: React.FC = () => {
               <ul className="max-h-60 overflow-y-auto divide-y divide-[#FFE6A7]">
                 {notifications.map(n => (
                   <li key={n.id} className={`py-2 px-1 ${n.read ? 'bg-white' : 'bg-[#FFF7E6]'}`}>
-                    <div className={`font-semibold ${n.type === 'warning' ? 'text-yellow-600' : n.type === 'error' ? 'text-red-600' : n.type === 'success' ? 'text-green-600' : 'text-[#B77B2B]'}`}>{n.message}</div>
+                    <div className={`font-semibold ${n.type === 'warning' ? 'text-yellow-600' : n.type === 'error' ? 'text-red-600' : 'text-[#B77B2B]'}`}>{n.message}</div>
                     <div className="text-xs text-[#8B6F3A] mt-1">{new Date(n.timestamp).toLocaleString()}</div>
                   </li>
                 ))}
               </ul>
             )}
             <button className="mt-4 text-xs text-orange-500 hover:underline" onClick={handleCloseNotifications}>Close</button>
+            <button className="mt-4 ml-4 text-xs text-red-500 hover:underline" onClick={handleClearNotifications}>Clear All</button>
           </div>
         )}
       </div>

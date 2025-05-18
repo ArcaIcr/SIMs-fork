@@ -2,60 +2,96 @@ import React, { useState, useEffect } from 'react';
 import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { FirestoreService } from '../../../services/firestoreService';
+import { Supplier, fetchSuppliers, addSupplier, updateSupplier, deleteSupplier } from '../../../models/supplierModel';
 
 const SUPPLIER_CATEGORIES = [
-  { label: 'Buns', icon: '🍔' },
-  { label: 'Patty', icon: '🥩' },
+  { label: 'Food', icon: '🍔' },
   { label: 'Drinks', icon: '🥤' },
   { label: 'Others', icon: '🍹' },
 ];
 
-const emptySupplier = { name: '', phone: '', email: '', address: '', category: SUPPLIER_CATEGORIES[0].label };
+const emptySupplier = {
+  name: '',
+  address: '',
+  phone: '',
+  email: '',
+  category: SUPPLIER_CATEGORIES[0].label,
+};
 
 const SuppliersPage = () => {
   const { user } = useUser();
-  const [selectedCategory, setSelectedCategory] = useState(SUPPLIER_CATEGORIES[0].label);
-  const [suppliers, setSuppliers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
-  const [showEdit, setShowEdit] = useState<any>(null);
-  const [showRequest, setShowRequest] = useState<any>(null);
-  const [form, setForm] = useState(emptySupplier);
   const navigate = useNavigate();
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState(SUPPLIER_CATEGORIES[0].label);
+  const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState<Supplier | null>(null);
+  const [showRequest, setShowRequest] = useState<Supplier | null>(null);
+  const [form, setForm] = useState(emptySupplier);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSuppliers = async () => {
-      setLoading(true);
-      const docs = await FirestoreService.getAll('suppliers');
+    const fetchData = async () => {
+      const docs = await fetchSuppliers();
       setSuppliers(docs);
-      setLoading(false);
     };
-    fetchSuppliers();
+    fetchData();
   }, []);
 
-  const handleAdd = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await FirestoreService.create('suppliers', form);
-    setShowAdd(false);
-    setForm(emptySupplier);
-    const docs = await FirestoreService.getAll('suppliers');
-    setSuppliers(docs);
-  };
+    setError(null);
+    setSuccess(null);
 
-  const handleEdit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await FirestoreService.update('suppliers', showEdit.id, form);
-    setShowEdit(null);
-    setForm(emptySupplier);
-    const docs = await FirestoreService.getAll('suppliers');
-    setSuppliers(docs);
+    try {
+      if (showEdit) {
+        const success = await updateSupplier(showEdit.id, form, {
+          displayName: user?.displayName,
+          branchId: user?.branchId,
+        });
+        if (success) {
+          const docs = await fetchSuppliers();
+          setSuppliers(docs);
+          setShowEdit(null);
+          setSuccess('Supplier updated successfully!');
+        } else {
+          setError('Failed to update supplier. Please try again.');
+        }
+      } else {
+        const added = await addSupplier(form, {
+          displayName: user?.displayName,
+          branchId: user?.branchId,
+        });
+        if (added) {
+          setSuppliers(prev => [...prev, added]);
+          setShowAdd(false);
+          setSuccess('Supplier added successfully!');
+        } else {
+          setError('Failed to add supplier. Please try again.');
+        }
+      }
+      setForm(emptySupplier);
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await FirestoreService.delete('suppliers', id);
-    const docs = await FirestoreService.getAll('suppliers');
-    setSuppliers(docs);
+    try {
+      const success = await deleteSupplier(id, {
+        displayName: user?.displayName,
+        branchId: user?.branchId,
+      });
+      if (success) {
+        const docs = await fetchSuppliers();
+        setSuppliers(docs);
+        setSuccess('Supplier deleted successfully!');
+      } else {
+        setError('Failed to delete supplier. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -89,24 +125,29 @@ const SuppliersPage = () => {
             </button>
           ))}
         </div>
-        {loading ? (
-          <div className="text-[#B77B2B]">Loading...</div>
-        ) : SUPPLIER_CATEGORIES.map(cat => (
-          <div key={cat.label} className="mb-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">{cat.icon}</span>
-              <span className="font-bold text-lg text-[#B77B2B]">{cat.label}</span>
-            </div>
-            <div className="bg-white rounded-2xl shadow-xl">
-              <div className="grid grid-cols-12 px-4 py-2 border-b font-semibold text-[#B77B2B]">
-                <div className="col-span-1">#</div>
-                <div className="col-span-3">Supplier Name</div>
-                <div className="col-span-4">Address</div>
-                <div className="col-span-4">Contact</div>
-                <div className="col-span-3 text-center"> </div>
+        {error && (
+          <div className="text-red-500 mb-4">{error}</div>
+        )}
+        {success && (
+          <div className="text-green-500 mb-4">{success}</div>
+        )}
+        {suppliers.filter(s => s.category === selectedCategory).map((supplier, idx) => {
+          const category = SUPPLIER_CATEGORIES.find(cat => cat.label === supplier.category);
+          return (
+            <div key={supplier.id} className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">{category?.icon}</span>
+                <span className="font-bold text-lg text-[#B77B2B]">{supplier.name}</span>
               </div>
-              {suppliers.filter(s => s.category === cat.label).map((supplier, idx) => (
-                <div key={supplier.id} className="grid grid-cols-12 px-4 py-3 items-center border-b last:border-b-0 bg-[#FFD59A]">
+              <div className="bg-white rounded-2xl shadow-xl">
+                <div className="grid grid-cols-12 px-4 py-2 border-b font-semibold text-[#B77B2B]">
+                  <div className="col-span-1">#</div>
+                  <div className="col-span-3">Supplier Name</div>
+                  <div className="col-span-4">Address</div>
+                  <div className="col-span-4">Contact</div>
+                  <div className="col-span-3 text-center"> </div>
+                </div>
+                <div className="grid grid-cols-12 px-4 py-3 items-center border-b last:border-b-0 bg-[#FFD59A]">
                   <div className="col-span-1 font-bold">{idx + 1}</div>
                   <div className="col-span-3">{supplier.name}</div>
                   <div className="col-span-4">{supplier.address}</div>
@@ -120,17 +161,17 @@ const SuppliersPage = () => {
                     <button className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-3 rounded-full shadow" onClick={() => handleDelete(supplier.id)}>DELETE</button>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       {/* Add Supplier Modal */}
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md relative">
             <button className="absolute top-2 right-2 text-[#B77B2B] text-2xl font-bold hover:text-red-500" onClick={() => setShowAdd(false)} aria-label="Close">&times;</button>
-            <form onSubmit={handleAdd} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <h2 className="text-xl font-bold text-[#B77B2B] mb-2">Add Supplier</h2>
               <input type="text" className="border rounded px-3 py-2" placeholder="Supplier Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
               <input type="text" className="border rounded px-3 py-2" placeholder="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} required />
@@ -151,7 +192,7 @@ const SuppliersPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md relative">
             <button className="absolute top-2 right-2 text-[#B77B2B] text-2xl font-bold hover:text-red-500" onClick={() => setShowEdit(null)} aria-label="Close">&times;</button>
-            <form onSubmit={handleEdit} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <h2 className="text-xl font-bold text-[#B77B2B] mb-2">Edit Supplier</h2>
               <input type="text" className="border rounded px-3 py-2" placeholder="Supplier Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
               <input type="text" className="border rounded px-3 py-2" placeholder="Phone" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} required />

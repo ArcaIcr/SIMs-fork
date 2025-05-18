@@ -3,16 +3,13 @@ import { FirestoreService } from '../services/firestoreService';
 export interface Notification {
   id?: string;
   message: string;
-  type: 'info' | 'warning' | 'error' | 'success';
+  type: 'info' | 'warning' | 'error';
   timestamp: number;
-  read?: boolean;
-  userId?: string;
-}
-
-export async function fetchNotifications(userId?: string): Promise<Notification[]> {
-  let all = await FirestoreService.getAll<Notification>('notifications');
-  if (userId) all = all.filter(n => !n.userId || n.userId === userId);
-  return all.sort((a, b) => b.timestamp - a.timestamp);
+  read: boolean;
+  branchId?: string;
+  actorName?: string;
+  isProfileUpdate?: boolean;
+  actorId?: string;
 }
 
 export async function addNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) {
@@ -21,14 +18,52 @@ export async function addNotification(notification: Omit<Notification, 'id' | 't
     timestamp: Date.now(),
     read: false,
   };
-  return FirestoreService.create('notifications', notif);
+  
+  await FirestoreService.create('notifications', notif);
+}
+
+export async function fetchNotifications(userId?: string, branchId?: string, isManager?: boolean): Promise<Notification[]> {
+  if (!userId && !branchId) return [];
+  
+  // If it's a profile update notification, only show to the actor and their manager
+  if (isManager) {
+    // Manager sees all notifications for their branch
+    return FirestoreService.query<Notification>('notifications', 'branchId', '==', branchId);
+  } else {
+    // Staff sees their own profile updates and all branch notifications
+    const profileUpdates = await FirestoreService.query<Notification>(
+      'notifications',
+      'actorId',
+      '==',
+      userId
+    );
+    
+    const branchNotifs = await FirestoreService.query<Notification>(
+      'notifications',
+      'branchId',
+      '==',
+      branchId
+    );
+    
+    return [...profileUpdates, ...branchNotifs.filter((n: Notification) => !n.isProfileUpdate)];
+  }
+}
+
+export async function fetchNotificationsByBranch(branchId?: string) {
+  if (!branchId) return [];
+  return FirestoreService.getWhere('notifications', 'branchId', '==', branchId);
 }
 
 export async function markNotificationRead(id: string) {
-  return FirestoreService.update('notifications', id, { read: true });
+  await FirestoreService.update('notifications', id, { read: true });
 }
 
-export async function markAllNotificationsRead(userId?: string) {
-  const notifs = await fetchNotifications(userId);
-  await Promise.all(notifs.filter(n => !n.read).map(n => markNotificationRead(n.id!)));
+export async function markAllNotificationsRead(branchId?: string) {
+  const notifs = await fetchNotifications(undefined, branchId);
+  await Promise.all(notifs.map((n: Notification) => markNotificationRead(n.id!)));
+}
+
+export async function clearNotifications(userId?: string, branchId?: string) {
+  const notifs = await fetchNotifications(userId, branchId);
+  await Promise.all(notifs.map((n: Notification) => FirestoreService.delete('notifications', n.id!)));
 } 

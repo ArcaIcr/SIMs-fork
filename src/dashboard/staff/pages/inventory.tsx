@@ -83,7 +83,10 @@ const InventoryPage = () => {
     setSavingItemId(id);
     setError(null);
     try {
-      const updatedStock = await adjustInventoryStock(id, adjustment);
+      const updatedStock = await adjustInventoryStock(id, adjustment, {
+        displayName: user?.displayName,
+        branchId: user?.branchId,
+      });
       if (updatedStock !== null) {
         setItems(prev => prev.map(item => 
           item.id === id ? { ...item, stock: updatedStock } : item
@@ -109,7 +112,10 @@ const InventoryPage = () => {
       const newStock = localStocks[id];
       const adjustment = newStock - currentStock;
       
-      const updatedStock = await adjustInventoryStock(id, adjustment);
+      const updatedStock = await adjustInventoryStock(id, adjustment, {
+        displayName: user?.displayName,
+        branchId: user?.branchId,
+      });
       if (updatedStock !== null) {
         setItems(prev => prev.map(item => 
           item.id === id ? { ...item, stock: updatedStock } : item
@@ -134,7 +140,10 @@ const InventoryPage = () => {
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
     setAdding(true);
-    const added = await addInventoryItem(newItem);
+    const added = await addInventoryItem(newItem, {
+      displayName: user?.displayName,
+      branchId: user?.branchId,
+    });
     if (added) setItems(prev => [...prev, added]);
     setNewItem({ name: '', stock: 0, category: CATEGORIES[0].label });
     setShowAddForm(false);

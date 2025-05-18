@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchNotifications, markNotificationRead, markAllNotificationsRead, Notification } from '../../../models/notificationModel';
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, clearNotifications, Notification } from '../../../models/notificationModel';
 // You can use react-icons or SVGs for better icons
 // import { FaBell, FaCog } from 'react-icons/fa';
 
@@ -10,7 +10,9 @@ interface StaffNavbarProps {
     role?: string;
     shift?: string;
     branchName?: string;
+    branchId?: string;
     id?: string;
+    email?: string;
   } | null;
 }
 
@@ -22,24 +24,31 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
 
   useEffect(() => {
     const fetchNotifs = async () => {
-      setLoading(true);
-      const notifs = await fetchNotifications(user?.id);
+      if (!user?.branchId) return;
+      const notifs = await fetchNotifications(user.email, user.branchId, false);
       setNotifications(notifs);
-      setLoading(false);
     };
     fetchNotifs();
-  }, [user]);
+  }, [user?.branchId]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleOpenNotifications = async () => {
-    setShowNotifications(true);
-    await markAllNotificationsRead(user?.id);
-    const notifs = await fetchNotifications(user?.id);
+    if (!user?.branchId) return;
+    await markAllNotificationsRead(user.branchId);
+    const notifs = await fetchNotifications(user.email, user.branchId, false);
     setNotifications(notifs);
+    setShowNotifications(true);
   };
 
   const handleCloseNotifications = () => setShowNotifications(false);
+
+  const handleClearNotifications = async () => {
+    if (!user?.branchId) return;
+    await clearNotifications(user.email, user.branchId);
+    const notifs = await fetchNotifications(user.email, user.branchId, false);
+    setNotifications(notifs);
+  };
 
   console.log('StaffNavbar user:', user);
 
@@ -99,13 +108,14 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
               <ul className="max-h-60 overflow-y-auto divide-y divide-[#FFE6A7]">
                 {notifications.map(n => (
                   <li key={n.id} className={`py-2 px-1 ${n.read ? 'bg-white' : 'bg-[#FFF7E6]'}`}>
-                    <div className={`font-semibold ${n.type === 'warning' ? 'text-yellow-600' : n.type === 'error' ? 'text-red-600' : n.type === 'success' ? 'text-green-600' : 'text-[#B77B2B]'}`}>{n.message}</div>
+                    <div className={`font-semibold ${n.type === 'warning' ? 'text-yellow-600' : n.type === 'error' ? 'text-red-600' : 'text-[#B77B2B]'}`}>{n.message}</div>
                     <div className="text-xs text-[#8B6F3A] mt-1">{new Date(n.timestamp).toLocaleString()}</div>
                   </li>
                 ))}
               </ul>
             )}
             <button className="mt-4 text-xs text-orange-500 hover:underline" onClick={handleCloseNotifications}>Close</button>
+            <button className="mt-4 ml-4 text-xs text-red-500 hover:underline" onClick={handleClearNotifications}>Clear All</button>
           </div>
         )}
       </div>
