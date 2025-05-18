@@ -10,6 +10,8 @@ import AboutUs from "../dashboard/AboutUs";
 import AdminDashboard from "../admin/AdminDashboard";
 import AdminLogin from "../admin/AdminLogin";
 import AdminSignUp from "../admin/AdminSignUp";
+import ManagerDashboard from "../dashboard/manager/pages/dashboard";
+import ManagerSales from "../dashboard/manager/pages/sales";
 
 function App() {
     return (
@@ -23,6 +25,8 @@ function App() {
                 <Route path="/dashboard/staff/inventory" element={<StaffInventory />} />
                 <Route path="/dashboard/staff/suppliers" element={<StaffSuppliers />} />
                 <Route path="/dashboard/staff/settings" element={<StaffSettings />} />
+                <Route path="/dashboard/manager" element={<ManagerDashboard />} />
+                <Route path="/dashboard/manager/sales" element={<ManagerSales />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />

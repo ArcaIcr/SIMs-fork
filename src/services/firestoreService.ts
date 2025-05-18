@@ -243,4 +243,17 @@ export class FirestoreService {
       return [];
     }
   }
+
+  // Fetch all sales data for all dates
+  static async getAllSalesData(): Promise<{ date: string, products: any[] }[]> {
+    const salesCollection = collection(db, 'sales');
+    const salesSnapshots = await getDocs(salesCollection);
+    const allSales: { date: string, products: any[] }[] = [];
+    for (const dateDoc of salesSnapshots.docs) {
+      const productsSnapshot = await getDocs(collection(db, `sales/${dateDoc.id}/products`));
+      const products = productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      allSales.push({ date: dateDoc.id, products });
+    }
+    return allSales;
+  }
 }

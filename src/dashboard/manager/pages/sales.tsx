@@ -1,42 +1,47 @@
-import React, { useState } from 'react';
-import SalesCategoryTabs from '../components/SalesCategoryTabs';
-import SalesProductGrid from '../components/SalesProductGrid';
+import React, { useEffect, useState } from 'react';
 import ManagerNavbar from '../components/ManagerNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-
-const CATEGORIES = [
-  'BIGTIME SANDWICHES',
-  'SULIT SANDWICHES',
-  'CHICKEN TIME SANDWICHES',
-  'HOTDOGS',
-  'DRINKS',
-  'EXTRA',
-];
-
-const DUMMY_PRODUCTS = [
-  // Example dummy data; replace with real data source as needed
-  { id: 1, name: 'Bacon Cheese Burger', revenue: 91, price: 97, count: 3, category: 'BIGTIME SANDWICHES', img: '/img/bacon.png' },
-  { id: 2, name: 'Beef Shawarma Burger', revenue: 60, price: 92, count: 5, category: 'BIGTIME SANDWICHES', img: '/img/shawarma.png' },
-  { id: 3, name: 'Black Pepper Burger', revenue: 180, price: 90, count: 2, category: 'BIGTIME SANDWICHES', img: '/img/pepper.png' },
-  { id: 4, name: 'Chimichurri Chicken Burger', revenue: 101, price: 101, count: 1, category: 'SULIT SANDWICHES', img: '/img/chimi.png' },
-  { id: 5, name: '50/50 Veggie Chicken Burger', revenue: 87, price: 87, count: 1, category: 'SULIT SANDWICHES', img: '/img/veggie.png' },
-  { id: 6, name: 'Premium Steak Burger', revenue: 142, price: 142, count: 2, category: 'BIGTIME SANDWICHES', img: '/img/steak.png' },
-  { id: 7, name: 'Roasted Sesame Burger', revenue: 95, price: 95, count: 0, category: 'SULIT SANDWICHES', img: '/img/sesame.png' },
-];
+import { FirestoreService } from '../../../services/firestoreService';
+import { DUMMY_PRODUCTS } from '../../staff/pages/sales';
 
 const SalesPage = () => {
   const { user } = useUser();
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
+  const [allSales, setAllSales] = useState<{ id: string, name: string, count: number, revenue: number, img?: string }[]>([]);
   const navigate = useNavigate();
 
-  const filteredProducts = DUMMY_PRODUCTS.filter(
-    (prod) => prod.category === selectedCategory
-  );
+  useEffect(() => {
+    async function fetchAndAggregate() {
+      const allSalesData = await FirestoreService.getAllSalesData();
+      const salesMap: Record<string, { count: number, revenue: number }> = {};
+      allSalesData.forEach(({ products }) => {
+        products.forEach(prod => {
+          if (!salesMap[prod.id]) {
+            salesMap[prod.id] = { count: 0, revenue: 0 };
+          }
+          salesMap[prod.id].count += prod.count || 0;
+          salesMap[prod.id].revenue += prod.revenue || 0;
+        });
+      });
+      // Map to DUMMY_PRODUCTS for name and img
+      const salesArr = DUMMY_PRODUCTS
+        .map(prod => ({
+          id: String(prod.id),
+          name: prod.name,
+          img: prod.img,
+          count: salesMap[prod.id]?.count || 0,
+          revenue: salesMap[prod.id]?.revenue || 0,
+        }))
+        .filter(prod => prod.count > 0)
+        .sort((a, b) => b.count - a.count);
+      setAllSales(salesArr);
+    }
+    fetchAndAggregate();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FFF7E6] flex flex-col">
-      <ManagerNavbar user={user} />
+      <ManagerNavbar />
       <div className="px-8 py-6">
         <div className="flex items-center mb-4">
           <button
@@ -46,14 +51,43 @@ const SalesPage = () => {
           >
             &#8592;
           </button>
-          <h1 className="text-2xl font-bold text-[#B77B2B] mb-0">Sales</h1>
+          <h1 className="text-2xl font-bold text-[#B77B2B] mb-0">All Sales (View Only)</h1>
         </div>
-        <SalesCategoryTabs
-          categories={CATEGORIES}
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
-        <SalesProductGrid products={filteredProducts} />
+        <div className="flex flex-col gap-2">
+          {allSales.length === 0 ? (
+            <div className="text-[#B77B2B]">No sales data.</div>
+          ) : (
+            allSales.map((prod, idx) => (
+              <React.Fragment key={prod.id}>
+                <div className="flex justify-between items-center font-semibold text-[#B77B2B]">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={prod.img}
+                      alt={prod.name}
+                      className="w-8 h-8 object-cover rounded border border-[#E2C089] bg-white"
+                      title={prod.name}
+                    />
+                    <span title={prod.name}>{prod.name}</span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span>{prod.count} <span className="text-xs text-[#8B6F3A]">sold</span></span>
+                    <span className="text-xs text-green-700">₱{prod.revenue.toLocaleString()}</span>
+                  </div>
+                </div>
+                <div
+                  className="w-full h-2 bg-[#FFE6A7] rounded mb-2"
+                  title={`${prod.name} - ${prod.count} sold`}
+                >
+                  <div
+                    className="h-2 bg-[#F2B04A] rounded"
+                    style={{ width: `${Math.min(100, (prod.count / (allSales[0]?.count || 1)) * 100)}%` }}
+                    title={`${prod.name} - ${prod.count} sold`}
+                  ></div>
+                </div>
+              </React.Fragment>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
