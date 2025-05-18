@@ -35,9 +35,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           let branchName: string | undefined = undefined;
           if (userData.branchId) {
             try {
+              console.log('[UserContext] branchId:', userData.branchId);
               const branchDoc = await getDoc(doc(db, 'branches', userData.branchId));
-              branchName = branchDoc.exists() ? branchDoc.data().name : undefined;
-            } catch {}
+              console.log('[UserContext] branchDoc.exists:', branchDoc.exists());
+              if (branchDoc.exists()) {
+                branchName = branchDoc.data().name;
+                console.log('[UserContext] branchName:', branchName);
+              } else {
+                console.warn('[UserContext] Branch document not found for branchId:', userData.branchId);
+              }
+            } catch (err) {
+              console.error('[UserContext] Error fetching branch:', err);
+            }
+          } else {
+            console.warn('[UserContext] No branchId found in user data');
+          }
+          if (userData.branchId && !branchName) {
+            console.warn('[UserContext] branchName could not be set for branchId:', userData.branchId);
           }
           setUser({
             ...userData,

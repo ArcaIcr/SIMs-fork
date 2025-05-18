@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { authService } from '../services/authService';
 import { FirestoreService } from '../services/firestoreService';
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
     try {
       const user = await authService.signUp({ email: newEmail, password: newPassword, displayName: newDisplayName });
       if (user) {
-        await FirestoreService.create('users', {
+        await setDoc(doc(db, 'users', user.uid), {
           id: user.uid,
           email: newEmail,
           displayName: newDisplayName,

@@ -41,6 +41,8 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
 
   const handleCloseNotifications = () => setShowNotifications(false);
 
+  console.log('StaffNavbar user:', user);
+
   return (
     <div className="flex items-center justify-between px-8 py-4 bg-[#FFF7E6] border-b-2 border-[#E2C089] shadow-md">
       <div className="flex items-center gap-4">
@@ -48,7 +50,14 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
         <div>
           <div className="font-bold text-lg text-[#B77B2B]">Hello, {user?.displayName || 'Staff'}!</div>
           <div className="text-xs text-[#8B6F3A]">SIMS {user?.role || 'Staff'} | Shift: {user?.shift || 'N/A'}</div>
-          <div className="text-xs text-[#8B6F3A]">{user?.branchName ? `Branch: ${user.branchName}` : 'Branch'}</div>
+          <div className="text-xs text-[#8B6F3A]">
+            {user?.branchName
+              ? `Branch: ${user.branchName}`
+              : <span className="text-red-500 font-semibold">Branch: Not Set</span>}
+          </div>
+          {!user?.branchName && (
+            <div className="text-xs text-red-500 font-semibold">Warning: Branch name not set. Please check your user or branch data.</div>
+          )}
         </div>
       </div>
       <div className="flex gap-4">
