@@ -52,7 +52,7 @@ const CATEGORIES = [
   'EXTRA',
 ];
 
-const DUMMY_PRODUCTS = [
+export const DUMMY_PRODUCTS = [
   // BIGTIME SANDWICHES
   { id: 1, name: 'Bacon Cheese Burger', revenue: 291, price: 97, count: 3, category: 'BIGTIME SANDWICHES', img: baconCheese },
   { id: 2, name: 'Beef Shawarma Burger', revenue: 460, price: 92, count: 5, category: 'BIGTIME SANDWICHES', img: beefShawarma },

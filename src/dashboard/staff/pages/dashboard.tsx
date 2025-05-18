@@ -3,12 +3,27 @@ import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { InventoryItem, fetchInventory } from '../../../models/inventoryModel';
+import { FirestoreService } from '../../../services/firestoreService';
+import { DUMMY_PRODUCTS } from './sales';
+
+function getLast7Days() {
+  const days = [];
+  const today = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+  return days;
+}
 
 const Dashboard = () => {
   const { user, loading } = useUser();
   const navigate = useNavigate();
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [invLoading, setInvLoading] = useState(true);
+  const [commonSales, setCommonSales] = useState<{ id: number, name: string, count: number, img?: string }[]>([]);
+  const [salesRange, setSalesRange] = useState<'today' | 'week'>('week');
 
   useEffect(() => {
     (async () => {
@@ -18,6 +33,36 @@ const Dashboard = () => {
       setInvLoading(false);
     })();
   }, []);
+
+  useEffect(() => {
+    // Fetch sales for the selected range and aggregate
+    const fetchCommonSales = async () => {
+      let days: string[] = [];
+      if (salesRange === 'today') {
+        const today = new Date().toISOString().slice(0, 10);
+        days = [today];
+      } else {
+        days = getLast7Days();
+      }
+      const salesMap: { [id: number]: number } = {};
+      for (const day of days) {
+        const salesDocs = await FirestoreService.getAll(`sales/${day}/products`);
+        salesDocs.forEach((doc: any) => {
+          const id = Number(doc.id);
+          salesMap[id] = (salesMap[id] || 0) + (doc.count || 0);
+        });
+      }
+      // Map to product names
+      const salesArr = Object.entries(salesMap).map(([id, count]) => {
+        const prod = DUMMY_PRODUCTS.find(p => p.id === Number(id));
+        return prod ? { id: prod.id, name: prod.name, count: count as number, img: prod.img } : null;
+      }).filter(Boolean) as { id: number, name: string, count: number, img?: string }[];
+      // Sort by count desc, take top 4
+      salesArr.sort((a, b) => b.count - a.count);
+      setCommonSales(salesArr.slice(0, 4));
+    };
+    fetchCommonSales();
+  }, [salesRange]);
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) return { label: 'OUT OF STOCK', color: 'text-red-600' };
@@ -44,16 +89,56 @@ const Dashboard = () => {
         <div className="flex gap-8 w-full max-w-5xl mt-6">
           {/* Common Sales */}
           <div className="flex-1 bg-white rounded-2xl shadow-xl p-6">
-            <div className="text-lg font-bold text-[#B77B2B] mb-4">Common Sales</div>
+            <div className="text-lg font-bold text-[#B77B2B] mb-4 flex items-center gap-4">
+              Common Sales
+              <div className="flex gap-2 ml-auto">
+                <button
+                  className={`px-3 py-1 rounded-lg text-sm font-semibold border ${salesRange === 'today' ? 'bg-[#F2B04A] text-white' : 'bg-white text-[#B77B2B] border-[#F2B04A]'}`}
+                  onClick={() => setSalesRange('today')}
+                >
+                  Today
+                </button>
+                <button
+                  className={`px-3 py-1 rounded-lg text-sm font-semibold border ${salesRange === 'week' ? 'bg-[#F2B04A] text-white' : 'bg-white text-[#B77B2B] border-[#F2B04A]'}`}
+                  onClick={() => setSalesRange('week')}
+                >
+                  Last 7 Days
+                </button>
+              </div>
+            </div>
             <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center font-semibold text-[#B77B2B]">Minute Burger <span>17</span></div>
-              <div className="w-full h-2 bg-[#FFE6A7] rounded mb-2"><div className="h-2 bg-[#F2B04A] rounded" style={{ width: '85%' }}></div></div>
-              <div className="flex justify-between items-center font-semibold text-[#B77B2B]">Cheesy Burger <span>15</span></div>
-              <div className="w-full h-2 bg-[#FFE6A7] rounded mb-2"><div className="h-2 bg-[#F2B04A] rounded" style={{ width: '75%' }}></div></div>
-              <div className="flex justify-between items-center font-semibold text-[#B77B2B]">Cheesydog <span>9</span></div>
-              <div className="w-full h-2 bg-[#FFE6A7] rounded mb-2"><div className="h-2 bg-[#F2B04A] rounded" style={{ width: '45%' }}></div></div>
-              <div className="flex justify-between items-center font-semibold text-[#B77B2B]">Beef Shawarma Burger <span>5</span></div>
-              <div className="w-full h-2 bg-[#FFE6A7] rounded mb-2"><div className="h-2 bg-[#F2B04A] rounded" style={{ width: '25%' }}></div></div>
+              {commonSales.length === 0 ? (
+                <div className="text-[#B77B2B]">No sales data.</div>
+              ) : (
+                commonSales.map((prod, idx) => (
+                  <React.Fragment key={prod.id}>
+                    <div className="flex justify-between items-center font-semibold text-[#B77B2B]">
+                      <div className="flex items-center gap-2">
+                        {prod.img && (
+                          <img
+                            src={prod.img}
+                            alt={prod.name}
+                            className="w-8 h-8 object-cover rounded"
+                            title={`${prod.name} - ${prod.count} sold`}
+                          />
+                        )}
+                        <span title={prod.name}>{prod.name}</span>
+                      </div>
+                      <span>{prod.count}</span>
+                    </div>
+                    <div
+                      className="w-full h-2 bg-[#FFE6A7] rounded mb-2"
+                      title={`${prod.name} - ${prod.count} sold`}
+                    >
+                      <div
+                        className="h-2 bg-[#F2B04A] rounded"
+                        style={{ width: `${Math.min(100, (prod.count / (commonSales[0]?.count || 1)) * 100)}%` }}
+                        title={`${prod.name} - ${prod.count} sold`}
+                      ></div>
+                    </div>
+                  </React.Fragment>
+                ))
+              )}
             </div>
           </div>
           {/* Stock Tracker */}
