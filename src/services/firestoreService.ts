@@ -207,4 +207,40 @@ export class FirestoreService {
       return [];
     }
   }
+
+  // Generic method to set (create or overwrite) a document by path and id
+  static async setDoc(collectionPath: string, documentId: string, data: Record<string, any>): Promise<boolean> {
+    try {
+      const docRef = doc(db, collectionPath, documentId);
+      await setDoc(docRef, data);
+      return true;
+    } catch (error) {
+      console.error(`Error setting document in ${collectionPath}:`, error);
+      return false;
+    }
+  }
+
+  // Get sales history for a product across all dates
+  static async getSalesHistory(productId: number): Promise<{ date: string, count: number, revenue: number }[]> {
+    try {
+      const { db } = await import('../firebase');
+      const { collection, getDocs, doc, getDoc } = await import('firebase/firestore');
+      const salesCollection = collection(db, 'sales');
+      const salesSnapshots = await getDocs(salesCollection);
+      const history: { date: string, count: number, revenue: number }[] = [];
+      for (const dateDoc of salesSnapshots.docs) {
+        // Fetch product doc from subcollection 'products' under each date
+        const productDoc = await getDoc(doc(db, `sales/${dateDoc.id}/products`, String(productId)));
+        if (productDoc.exists()) {
+          const data = productDoc.data();
+          history.push({ date: dateDoc.id, count: data.count, revenue: data.revenue });
+        }
+      }
+      // Sort by date descending
+      return history.sort((a, b) => b.date.localeCompare(a.date));
+    } catch (error) {
+      console.error('Error fetching sales history:', error);
+      return [];
+    }
+  }
 }

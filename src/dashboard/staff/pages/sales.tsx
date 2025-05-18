@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SalesCategoryTabs from '../components/SalesCategoryTabs';
 import SalesProductGrid from '../components/SalesProductGrid';
 import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { FirestoreService } from '../../../services/firestoreService';
 import baconCheese from '../../../assets/bigtime-baconcheese.png';
 import beefShawarma from '../../../assets/bigtime-beefshawarma.png';
 import blackPepper from '../../../assets/bigtime-blackpepper.png';
@@ -97,14 +98,55 @@ const DUMMY_PRODUCTS = [
   { id: 32, name: 'Supreme Cheese', revenue: 676, price: 16, count: 13, category: 'EXTRA', img: cheese },
 ];
 
+function getTodayKey() {
+  const today = new Date();
+  return today.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
 const SalesPage = () => {
   const { user } = useUser();
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
+  const [salesData, setSalesData] = useState<{ [productId: number]: { count: number; revenue: number } }>({});
   const navigate = useNavigate();
+
+  // Fetch sales data for today on mount
+  useEffect(() => {
+    const fetchSales = async () => {
+      const todayKey = getTodayKey();
+      const salesDocs = await FirestoreService.getAll(`sales/${todayKey}/products`);
+      const data: { [productId: number]: { count: number; revenue: number } } = {};
+      salesDocs.forEach((doc: any) => {
+        data[Number(doc.id)] = { count: doc.count, revenue: doc.revenue };
+      });
+      setSalesData(data);
+    };
+    fetchSales();
+  }, []);
+
+  // Handler to update sales in Firestore and local state
+  const updateSales = async (productId: number, price: number, newCount: number) => {
+    const todayKey = getTodayKey();
+    const revenue = newCount * price;
+    // Upsert the sales doc for this product for today
+    const ok = await FirestoreService.setDoc(`sales/${todayKey}/products`, String(productId), { count: newCount, revenue });
+    // Ensure the date document exists for history listing
+    await FirestoreService.setDoc('sales', todayKey, { exists: true });
+    if (!ok) {
+      console.error('Failed to write sales data to Firestore for', productId, newCount, revenue);
+      alert('Failed to save sales data. Please check your Firestore rules and network.');
+    } else {
+      console.log('Sales data saved:', { productId, newCount, revenue });
+      setSalesData((prev) => ({ ...prev, [productId]: { count: newCount, revenue } }));
+    }
+  };
 
   const filteredProducts = DUMMY_PRODUCTS.filter(
     (prod) => prod.category === selectedCategory
-  );
+  ).map((prod) => ({
+    ...prod,
+    count: salesData[prod.id]?.count ?? 0,
+    revenue: salesData[prod.id]?.revenue ?? 0,
+  }));
 
   return (
     <div className="min-h-screen bg-[#FFF7E6] flex flex-col">
@@ -125,7 +167,7 @@ const SalesPage = () => {
           selected={selectedCategory}
           onSelect={setSelectedCategory}
         />
-        <SalesProductGrid products={filteredProducts} />
+        <SalesProductGrid products={filteredProducts} onUpdateSales={updateSales} />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import placeholderImg from '../../../assets/placeholder.png';
+import SalesHistoryModal from './SalesHistoryModal';
 
 interface Product {
   id: number;
@@ -13,10 +14,22 @@ interface Product {
 
 interface SalesProductCardProps {
   product: Product;
+  onUpdateSales: (productId: number, price: number, newCount: number) => void;
 }
 
-const SalesProductCard: React.FC<SalesProductCardProps> = ({ product }) => {
+const SalesProductCard: React.FC<SalesProductCardProps> = ({ product, onUpdateSales }) => {
   const [count, setCount] = useState(product.count);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Sync local count with parent prop
+  useEffect(() => {
+    setCount(product.count);
+  }, [product.count]);
+
+  const handleChange = (newCount: number) => {
+    setCount(newCount);
+    onUpdateSales(product.id, product.price, newCount);
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center">
@@ -32,18 +45,31 @@ const SalesProductCard: React.FC<SalesProductCardProps> = ({ product }) => {
       <div className="flex items-center gap-2 mt-2">
         <button
           className="bg-[#F9C97B] text-white rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold"
-          onClick={() => setCount((c) => Math.max(0, c - 1))}
+          onClick={() => handleChange(Math.max(0, count - 1))}
         >
           -
         </button>
         <span className="font-bold text-[#B77B2B] w-6 text-center">{count}</span>
         <button
           className="bg-[#F9C97B] text-white rounded-full w-7 h-7 flex items-center justify-center text-lg font-bold"
-          onClick={() => setCount((c) => c + 1)}
+          onClick={() => handleChange(count + 1)}
         >
           +
         </button>
+        <button
+          className="ml-2 bg-[#FFD59A] text-[#B77B2B] px-2 py-1 rounded text-xs"
+          onClick={() => setShowHistory(true)}
+        >
+          History
+        </button>
       </div>
+      {showHistory && (
+        <SalesHistoryModal
+          productId={product.id}
+          productName={product.name}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </div>
   );
 };
