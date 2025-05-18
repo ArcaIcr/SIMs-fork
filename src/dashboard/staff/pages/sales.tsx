@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import SalesCategoryTabs from '../components/SalesCategoryTabs';
 import SalesProductGrid from '../components/SalesProductGrid';
 import StaffNavbar from '../components/StaffNavbar';
@@ -136,7 +136,7 @@ const SalesPage = () => {
       alert('Failed to save sales data. Please check your Firestore rules and network.');
     } else {
       console.log('Sales data saved:', { productId, newCount, revenue });
-      setSalesData((prev) => ({ ...prev, [productId]: { count: newCount, revenue } }));
+      setSalesData((prev: { [productId: number]: { count: number; revenue: number } }) => ({ ...prev, [productId]: { count: newCount, revenue } }));
     }
   };
 

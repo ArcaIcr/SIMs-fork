@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { authService } from '../services/authService';
-import { FirestoreService } from '../services/firestoreService';
 
 // Types for Branch and User
 interface Branch {

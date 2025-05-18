@@ -49,11 +49,6 @@ export async function fetchNotifications(userId?: string, branchId?: string, isM
   }
 }
 
-export async function fetchNotificationsByBranch(branchId?: string) {
-  if (!branchId) return [];
-  return FirestoreService.getWhere('notifications', 'branchId', '==', branchId);
-}
-
 export async function markNotificationRead(id: string) {
   await FirestoreService.update('notifications', id, { read: true });
 }

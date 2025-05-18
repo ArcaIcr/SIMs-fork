@@ -1,68 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo 1.png";
-import burger from "../../assets/burger-removebg-preview.png";
 import bg from "../../assets/bg.png";
 import LoginForm from '../components/LoginForm';
-
-const TermsAndConditionsOverlay = ({ onClose }: { onClose: () => void }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
-    <div className="relative max-w-2xl w-full bg-white rounded-2xl shadow-lg p-8 overflow-y-auto" style={{ maxHeight: '90vh' }}>
-      <button className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold" onClick={onClose}>&times;</button>
-      <h2 className="text-xl font-bold text-brown-800 mb-4">Terms and Conditions: Smart Inventory Management System</h2>
-      
-      <p className="mb-4 text-brown-700">
-        Please read these Terms and Conditions ("Terms") carefully before using the Smart Inventory Management System ("the System") developed for the purpose of optimizing inventory tracking and management. These Terms constitute a legally binding agreement between you ("Minute Burger Staff") and our development team.
-      </p>
-
-      <p className="mb-4 text-brown-700">
-        By using the System, you acknowledge that you have read, understood, and agree to be bound by these Terms. If you do not agree to these Terms, you may not use the System.
-      </p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">1. Objective</h3>
-      <p className="mb-4 text-brown-700">
-        The main objective of the Smart Inventory Management System is to provide an efficient and user-friendly platform for tracking, organizing, and managing inventory. The System is designed to help Minute Burger staff monitor stock levels, reduce waste, and optimize supply chain operations.
-      </p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">2. User Responsibilities</h3>
-      <p className="mb-2 text-brown-700"><strong>2.1. Eligibility:</strong> The System is intended for use by Minute Burger staff members responsible for inventory management. By using the System, you represent and warrant that you have the legal authority to enter into this agreement on behalf of Minute Burger.</p>
-      <p className="mb-2 text-brown-700"><strong>2.2. Account Registration:</strong> You agree to provide accurate, complete, and up-to-date information during the registration process and are responsible for your credentials.</p>
-      <p className="mb-4 text-brown-700"><strong>2.3. Responsible Use:</strong> Use the System in compliance with laws. Do not engage in illegal, unauthorized, or unethical use.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">3. System Features</h3>
-      <p className="mb-2 text-brown-700"><strong>3.1. Inventory Management Features:</strong> Includes real-time tracking, alerts, reports, and analytics.</p>
-      <p className="mb-4 text-brown-700"><strong>3.2. Availability:</strong> While efforts are made to ensure availability, the developers do not guarantee uninterrupted access.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">4. Data Privacy and Security</h3>
-      <p className="mb-2 text-brown-700"><strong>4.1. Data Collection and Use:</strong> Your data may be used per the Privacy Policy and applicable laws.</p>
-      <p className="mb-4 text-brown-700"><strong>4.2. Data Security:</strong> While reasonable measures are used, absolute security cannot be guaranteed.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">5. Intellectual Property</h3>
-      <p className="mb-2 text-brown-700"><strong>5.1. Ownership:</strong> The system and its content are owned by the developers.</p>
-      <p className="mb-4 text-brown-700"><strong>5.2. Limited License:</strong> You are granted a limited license for use within Minute Burger only.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">6. Limitation of Liability</h3>
-      <p className="mb-4 text-brown-700">To the fullest extent permitted, the developers shall not be liable for indirect or consequential damages. Total liability is limited to the amount paid (if any) for using the System.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">7. Modifications and Termination</h3>
-      <p className="mb-4 text-brown-700">The developers may modify, suspend, or terminate the System or Terms at any time without notice. Continued use implies acceptance of changes.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">8. Governing Law and Jurisdiction</h3>
-      <p className="mb-4 text-brown-700">These Terms are governed by the laws of [Your Jurisdiction]. Disputes will be resolved in its courts.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">9. Severability</h3>
-      <p className="mb-4 text-brown-700">If any part of these Terms is invalid, the remaining provisions remain effective.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">10. Entire Agreement</h3>
-      <p className="mb-4 text-brown-700">These Terms represent the full agreement regarding your use of the System.</p>
-
-      <h3 className="font-semibold text-brown-800 mb-2">11. Contact Information</h3>
-      <p className="mb-4 text-brown-700">For any questions, contact us at [Your Contact Information].</p>
-
-      <p className="text-sm text-brown-600">Effective Date: </p>
-    </div>
-  </div>
-);
 
 const AboutUsOverlay = ({ onClose }: { onClose: () => void }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">

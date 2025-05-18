@@ -110,7 +110,7 @@ const Dashboard = () => {
               {commonSales.length === 0 ? (
                 <div className="text-[#B77B2B]">No sales data.</div>
               ) : (
-                commonSales.map((prod, idx) => (
+                commonSales.map((prod) => (
                   <React.Fragment key={prod.id}>
                     <div className="flex justify-between items-center font-semibold text-[#B77B2B]">
                       <div className="flex items-center gap-2">

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
-import { FirestoreService } from '../../../services/firestoreService';
 import { InventoryItem, fetchInventory, addInventoryItem, adjustInventoryStock } from '../../../models/inventoryModel';
 
 const CATEGORIES = [

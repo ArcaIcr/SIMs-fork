@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ManagerNavbar from '../components/ManagerNavbar';
-import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { FirestoreService } from '../../../services/firestoreService';
 import { DUMMY_PRODUCTS } from '../../staff/pages/sales';
 
 const SalesPage = () => {
-  const { user } = useUser();
   const [allSales, setAllSales] = useState<{ id: string, name: string, count: number, revenue: number, img?: string }[]>([]);
   const navigate = useNavigate();
 
@@ -57,7 +55,7 @@ const SalesPage = () => {
           {allSales.length === 0 ? (
             <div className="text-[#B77B2B]">No sales data.</div>
           ) : (
-            allSales.map((prod, idx) => (
+            allSales.map((prod) => (
               <React.Fragment key={prod.id}>
                 <div className="flex justify-between items-center font-semibold text-[#B77B2B]">
                   <div className="flex items-center gap-2">

@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import ManagerNavbar from '../components/ManagerNavbar';
-import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import StockTrackerCard from '../components/StockTrackerCard';
 import { FirestoreService } from '../../../services/firestoreService';
 import { DUMMY_PRODUCTS } from '../../staff/pages/sales';
 
 const Dashboard = () => {
-  const { user, loading } = useUser();
   const navigate = useNavigate();
   const [commonSales, setCommonSales] = useState<{ id: string, name: string, count: number, revenue: number, img?: string }[]>([]);
   const [showAll, setShowAll] = useState(false);
@@ -41,10 +39,6 @@ const Dashboard = () => {
     fetchAndAggregate();
   }, []);
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>;
-  }
-
   // Calculate summary
   const totalSold = commonSales.reduce((sum, prod) => sum + prod.count, 0);
   const totalRevenue = commonSales.reduce((sum, prod) => sum + prod.revenue, 0);
@@ -75,7 +69,7 @@ const Dashboard = () => {
               {displaySales.length === 0 ? (
                 <div className="text-[#B77B2B]">No sales data.</div>
               ) : (
-                displaySales.map((prod, idx) => (
+                displaySales.map((prod) => (
                   <React.Fragment key={prod.id}>
                     <div
                       className="flex justify-between items-center font-semibold text-[#B77B2B] group"

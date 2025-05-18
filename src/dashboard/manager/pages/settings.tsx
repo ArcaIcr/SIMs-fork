@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { db, auth, storage } from '../../../firebase';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
-import { User as FirebaseUser } from 'firebase/auth';
 import { addNotification } from '../../../models/notificationModel';
 
 const UserIcon = () => (
@@ -30,7 +29,7 @@ const Toast = ({ message, type, onClose }: { message: string; type: 'success' | 
 );
 
 const SettingsPage = () => {
-  const { user, loading } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');

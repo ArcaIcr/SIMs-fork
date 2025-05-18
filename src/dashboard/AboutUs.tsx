@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function AboutUs() {
   return (
     <div className="min-h-screen bg-[#fff7ea] flex justify-center items-center">

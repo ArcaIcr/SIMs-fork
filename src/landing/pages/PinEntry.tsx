@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import logo from "../../assets/logo 1.png";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FirestoreService, User as FirestoreUser, Branch as FirestoreBranch } from '../../services/firestoreService';
 

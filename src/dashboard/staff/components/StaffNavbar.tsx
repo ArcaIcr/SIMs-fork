@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchNotifications, markNotificationRead, markAllNotificationsRead, clearNotifications, Notification } from '../../../models/notificationModel';
+import { fetchNotifications, markAllNotificationsRead, clearNotifications, Notification } from '../../../models/notificationModel';
 // You can use react-icons or SVGs for better icons
 // import { FaBell, FaCog } from 'react-icons/fa';
 
@@ -20,7 +20,6 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNotifs = async () => {
@@ -100,9 +99,7 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
         {showNotifications && (
           <div className="absolute top-16 right-0 bg-white border border-[#E2C089] rounded-xl shadow-lg p-4 w-80 z-50">
             <div className="font-bold text-[#B77B2B] mb-2">Notifications</div>
-            {loading ? (
-              <div className="text-sm text-[#8B6F3A]">Loading...</div>
-            ) : notifications.length === 0 ? (
+            {notifications.length === 0 ? (
               <div className="text-sm text-[#8B6F3A]">No notifications.</div>
             ) : (
               <ul className="max-h-60 overflow-y-auto divide-y divide-[#FFE6A7]">

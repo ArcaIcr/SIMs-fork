@@ -9,9 +9,6 @@ import {
   getDocs, 
   query,
   where,
-  DocumentReference,
-  DocumentSnapshot,
-  QuerySnapshot
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
