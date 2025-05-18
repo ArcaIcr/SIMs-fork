@@ -20,6 +20,7 @@ interface User {
   role: 'ADMIN' | 'MANAGER' | 'STAFF';
   branchId?: string;
   lastLogin?: Date;
+  shift?: string;
 }
 
 export default function AdminDashboard() {
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
   const [newRole, setNewRole] = useState<'MANAGER' | 'STAFF'>('MANAGER');
   const [newBranchId, setNewBranchId] = useState('');
   const [newPin, setNewPin] = useState('');
+  const [newShift, setNewShift] = useState('');
   const [addError, setAddError] = useState('');
   const [addSuccess, setAddSuccess] = useState('');
 
@@ -100,7 +102,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setAddError('');
     setAddSuccess('');
-    if (!newEmail || !newPassword || !newDisplayName || !newBranchId || !newPin) {
+    if (!newEmail || !newPassword || !newDisplayName || !newBranchId || !newPin || !newShift) {
       setAddError('All fields are required.');
       return;
     }
@@ -114,11 +116,12 @@ export default function AdminDashboard() {
           role: newRole,
           branchId: newBranchId,
           pin: newPin,
+          shift: newShift,
         });
         setAddSuccess('Account created successfully!');
         setTimeout(() => {
           setShowAddModal(false);
-          setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('MANAGER'); setNewBranchId(''); setNewPin(''); setAddSuccess('');
+          setNewEmail(''); setNewPassword(''); setNewDisplayName(''); setNewRole('MANAGER'); setNewBranchId(''); setNewPin(''); setNewShift(''); setAddSuccess('');
           fetchUsers(selectedBranch || undefined);
         }, 1200);
       } else {
@@ -191,6 +194,20 @@ export default function AdminDashboard() {
                 <input type="password" value={newPin} onChange={e => setNewPin(e.target.value)} required maxLength={6} minLength={4} pattern="[0-9]*" inputMode="numeric" className="mt-1 block w-full border px-3 py-2 rounded" placeholder="Enter 4-6 digit PIN" />
               </div>
               <div>
+                <label className="block text-sm font-medium">Shift</label>
+                <select
+                  value={newShift}
+                  onChange={e => setNewShift(e.target.value)}
+                  required
+                  className="mt-1 block w-full border px-3 py-2 rounded"
+                >
+                  <option value="">Select shift</option>
+                  <option value="Morning">Morning</option>
+                  <option value="Afternoon">Afternoon</option>
+                  <option value="Night">Night</option>
+                </select>
+              </div>
+              <div>
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Create Account</button>
               </div>
             </form>
@@ -228,6 +245,7 @@ export default function AdminDashboard() {
               <th className="p-3 text-left">Role</th>
               <th className="p-3 text-left">Branch</th>
               <th className="p-3 text-left">Last Login</th>
+              <th className="p-3 text-left">Shift</th>
             </tr>
           </thead>
           <tbody>
@@ -242,6 +260,7 @@ export default function AdminDashboard() {
                 <td className="p-3">
                   {user.lastLogin ? user.lastLogin.toLocaleString() : 'Never'}
                 </td>
+                <td className="p-3">{user.shift || 'N/A'}</td>
               </tr>
             ))}
           </tbody>
