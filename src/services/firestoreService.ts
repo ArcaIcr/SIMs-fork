@@ -201,7 +201,7 @@ export class FirestoreService {
     try {
       const q = query(collection(db, collectionName), where(field, operator, value));
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+      return querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() } as T));
     } catch (error) {
       console.error(`Error querying ${collectionName}:`, error);
       return [];
