@@ -10,6 +10,9 @@ export type User = {
   branchId?: string;
   branchName?: string;
   email?: string;
+  phone?: string;
+  pin?: string;
+  photoURL?: string;
 };
 
 interface UserContextType {

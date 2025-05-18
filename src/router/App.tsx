@@ -13,6 +13,7 @@ import AdminSignUp from "../admin/AdminSignUp";
 import ManagerDashboard from "../dashboard/manager/pages/dashboard";
 import ManagerSales from "../dashboard/manager/pages/sales";
 import ManagerSuppliers from "../dashboard/manager/pages/suppliers";
+import ManagerSettings from "../dashboard/manager/pages/settings";
 
 function App() {
     return (
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/dashboard/manager" element={<ManagerDashboard />} />
                 <Route path="/dashboard/manager/sales" element={<ManagerSales />} />
                 <Route path="/dashboard/manager/suppliers" element={<ManagerSuppliers />} />
+                <Route path="/dashboard/manager/settings" element={<ManagerSettings />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />
