@@ -12,6 +12,7 @@ import AdminLogin from "../admin/AdminLogin";
 import AdminSignUp from "../admin/AdminSignUp";
 import ManagerDashboard from "../dashboard/manager/pages/dashboard";
 import ManagerSales from "../dashboard/manager/pages/sales";
+import ManagerSuppliers from "../dashboard/manager/pages/suppliers";
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/dashboard/staff/settings" element={<StaffSettings />} />
                 <Route path="/dashboard/manager" element={<ManagerDashboard />} />
                 <Route path="/dashboard/manager/sales" element={<ManagerSales />} />
+                <Route path="/dashboard/manager/suppliers" element={<ManagerSuppliers />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />

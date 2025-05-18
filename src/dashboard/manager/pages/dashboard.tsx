@@ -58,7 +58,7 @@ const Dashboard = () => {
         {/* Top Buttons */}
         <div className="flex gap-8 w-full max-w-2xl justify-center mt-4">
           <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]" onClick={() => navigate('/dashboard/manager/sales')}>Sales</button>
-          <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]">Suppliers</button>
+          <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]" onClick={() => navigate('/dashboard/manager/suppliers')}>Suppliers</button>
         </div>
         {/* Main Dashboard Content */}
         <div className="flex gap-8 w-full max-w-5xl mt-6">
