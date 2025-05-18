@@ -19,7 +19,7 @@ const Dashboard = () => {
         <div className="flex gap-8 w-full max-w-4xl justify-center mt-4">
           <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]" onClick={() => navigate('/dashboard/staff/inventory')}>Inventory</button>
           <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]" onClick={() => navigate('/dashboard/staff/sales')}>Sales</button>
-          <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]">Suppliers</button>
+          <button className="flex-1 py-4 rounded-2xl bg-white shadow text-xl font-semibold text-[#B77B2B] border-2 border-[#E2C089] hover:bg-[#FFF0D2]" onClick={() => navigate('/dashboard/staff/suppliers')}>Suppliers</button>
         </div>
         {/* Main Dashboard Content */}
         <div className="flex gap-8 w-full max-w-5xl mt-6">

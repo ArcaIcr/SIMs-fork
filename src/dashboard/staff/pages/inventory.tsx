@@ -1,24 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
+import { FirestoreService } from '../../../services/firestoreService';
+import { InventoryItem, fetchInventory, addInventoryItem } from './inventoryModel';
 
 const CATEGORIES = [
   { label: 'Buns', icon: '🍔' },
   { label: 'Patty', icon: '🥩' },
   { label: 'Drinks', icon: '🥤' },
   { label: 'Others', icon: '🍹' },
-];
-
-const INITIAL_ITEMS = [
-  { id: 1, name: 'Value Buns', stock: 12, category: 'Buns', status: 'low' },
-  { id: 2, name: 'DMB Buns', stock: 21, category: 'Buns', status: 'medium' },
-  { id: 3, name: 'Chicken Buns', stock: 34, category: 'Buns', status: 'high' },
-  { id: 4, name: 'Bacon Cheese Burger Buns', stock: 32, category: 'Buns', status: 'high' },
-  { id: 5, name: 'Black Pepper Buns', stock: 34, category: 'Buns', status: 'high' },
-  { id: 6, name: '50/50 Veggies Burger Buns', stock: 36, category: 'Buns', status: 'high' },
-  { id: 7, name: 'DMB Buns', stock: 12, category: 'Buns', status: 'low' },
-  // Add more items for other categories as needed
 ];
 
 const statusColor = {
@@ -30,15 +21,39 @@ const statusColor = {
 const InventoryPage = () => {
   const { user } = useUser();
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0].label);
-  const [items, setItems] = useState(INITIAL_ITEMS);
+  const [items, setItems] = useState<InventoryItem[]>([]);
   const navigate = useNavigate();
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newItem, setNewItem] = useState({
+    name: '',
+    stock: 0,
+    category: CATEGORIES[0].label,
+  });
+  const [adding, setAdding] = useState(false);
 
   const filteredItems = items.filter(item => item.category === selectedCategory);
+
+  useEffect(() => {
+    (async () => {
+      const fetched = await fetchInventory();
+      setItems(fetched);
+    })();
+  }, []);
 
   const handleStockChange = (id: number, delta: number) => {
     setItems(prevItems => prevItems.map(item =>
       item.id === id ? { ...item, stock: Math.max(0, item.stock + delta) } : item
     ));
+  };
+
+  const handleAddItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAdding(true);
+    const added = await addInventoryItem(newItem);
+    if (added) setItems(prev => [...prev, added]);
+    setNewItem({ name: '', stock: 0, category: CATEGORIES[0].label });
+    setShowAddForm(false);
+    setAdding(false);
   };
 
   return (
@@ -66,6 +81,70 @@ const InventoryPage = () => {
             </button>
           ))}
         </div>
+        <div className="flex justify-end mb-4">
+          <button
+            className="bg-[#F9C97B] text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-[#FFD59A] transition-colors"
+            onClick={() => setShowAddForm(true)}
+          >
+            + Add Item
+          </button>
+        </div>
+        {showAddForm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md relative">
+              <button
+                className="absolute top-2 right-2 text-[#B77B2B] text-2xl font-bold hover:text-red-500"
+                onClick={() => setShowAddForm(false)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <form onSubmit={handleAddItem} className="flex flex-col gap-4">
+                <h2 className="text-xl font-bold text-[#B77B2B] mb-2">Add New Item</h2>
+                <div>
+                  <label className="block text-[#B77B2B] font-semibold mb-1">Name</label>
+                  <input
+                    type="text"
+                    className="w-full border rounded px-3 py-2"
+                    value={newItem.name}
+                    onChange={e => setNewItem({ ...newItem, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#B77B2B] font-semibold mb-1">Stock</label>
+                  <input
+                    type="number"
+                    className="w-full border rounded px-3 py-2"
+                    value={newItem.stock}
+                    min={0}
+                    onChange={e => setNewItem({ ...newItem, stock: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[#B77B2B] font-semibold mb-1">Category</label>
+                  <select
+                    className="w-full border rounded px-3 py-2"
+                    value={newItem.category}
+                    onChange={e => setNewItem({ ...newItem, category: e.target.value })}
+                  >
+                    {CATEGORIES.map(cat => (
+                      <option key={cat.label} value={cat.label}>{cat.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="bg-[#B77B2B] text-white px-4 py-2 rounded-lg font-semibold shadow hover:bg-[#FFD59A] transition-colors"
+                  disabled={adding}
+                >
+                  {adding ? 'Adding...' : 'Add Item'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
         <div className="bg-white rounded-2xl shadow-xl p-6">
           <div className="flex items-center gap-4 mb-2">
             <span className="w-6 h-6 rounded-full bg-red-500 inline-block"></span>

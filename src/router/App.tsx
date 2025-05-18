@@ -4,6 +4,8 @@ import PinEntry from "../landing/pages/PinEntry";
 import StaffDashboard from "../dashboard/staff/pages/dashboard";
 import StaffSales from "../dashboard/staff/pages/sales";
 import StaffInventory from "../dashboard/staff/pages/inventory";
+import StaffSuppliers from "../dashboard/staff/pages/suppliers";
+import StaffSettings from "../dashboard/staff/pages/settings";
 import AboutUs from "../dashboard/AboutUs";
 import AdminDashboard from "../admin/AdminDashboard";
 import AdminLogin from "../admin/AdminLogin";
@@ -19,6 +21,8 @@ function App() {
                 <Route path="/dashboard/staff/dashboard" element={<StaffDashboard />} />
                 <Route path="/dashboard/staff/sales" element={<StaffSales />} />
                 <Route path="/dashboard/staff/inventory" element={<StaffInventory />} />
+                <Route path="/dashboard/staff/suppliers" element={<StaffSuppliers />} />
+                <Route path="/dashboard/staff/settings" element={<StaffSettings />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/adminlogin" element={<AdminLogin />} />
