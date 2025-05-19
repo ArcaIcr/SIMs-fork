@@ -192,20 +192,22 @@ export default function AdminDashboard() {
                 <label className="block text-sm font-medium">PIN</label>
                 <input type="password" value={newPin} onChange={e => setNewPin(e.target.value)} required maxLength={6} minLength={4} pattern="[0-9]*" inputMode="numeric" className="mt-1 block w-full border px-3 py-2 rounded" placeholder="Enter 4-6 digit PIN" />
               </div>
-              <div>
-                <label className="block text-sm font-medium">Shift</label>
-                <select
-                  value={newShift}
-                  onChange={e => setNewShift(e.target.value)}
-                  required
-                  className="mt-1 block w-full border px-3 py-2 rounded"
-                >
-                  <option value="">Select shift</option>
-                  <option value="Morning">Morning</option>
-                  <option value="Afternoon">Afternoon</option>
-                  <option value="Night">Night</option>
-                </select>
-              </div>
+              {newRole === 'STAFF' && (
+                <div>
+                  <label className="block text-sm font-medium">Shift</label>
+                  <select
+                    value={newShift}
+                    onChange={e => setNewShift(e.target.value)}
+                    required
+                    className="mt-1 block w-full border px-3 py-2 rounded"
+                  >
+                    <option value="">Select shift</option>
+                    <option value="06:00-14:00">06:00 AM - 02:00 PM</option>
+                    <option value="14:00-22:00">02:00 PM - 10:00 PM</option>
+                    <option value="22:00-06:00">10:00 PM - 06:00 AM</option>
+                  </select>
+                </div>
+              )}
               <div>
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Create Account</button>
               </div>
