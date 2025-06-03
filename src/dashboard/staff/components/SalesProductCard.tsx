@@ -36,7 +36,7 @@ const SalesProductCard: React.FC<SalesProductCardProps> = ({ product, onUpdateSa
       <img
         src={product.img || placeholderImg}
         alt={product.name}
-        className="w-24 h-24 object-cover mb-2 rounded"
+        className="w-24 h-24 object-contain mb-2 rounded"
         loading="lazy"
         onError={e => (e.currentTarget.src = placeholderImg)}
       />
