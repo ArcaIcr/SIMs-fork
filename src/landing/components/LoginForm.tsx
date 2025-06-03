@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FirestoreService } from '../../services/firestoreService';
 import { authService } from '../../services/authService';
+import ForgotPasswordModal from './ForgotPasswordModal';
 
 interface LoginFormProps {
   onSuccess: (user: any) => void;
@@ -11,6 +12,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,28 +58,37 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   };
 
   return (
-    <form className="flex flex-col gap-5" onSubmit={handleLogin}>
-      <div className="relative">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
-          <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </span>
-        <input type="text" placeholder="Username or Email" value={username} onChange={e => setUsername(e.target.value)} className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
+    <>
+      <form className="flex flex-col gap-5" onSubmit={handleLogin}>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
+            <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <input type="text" placeholder="Username or Email" value={username} onChange={e => setUsername(e.target.value)} className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
+        </div>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
+            <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
+        </div>
+        {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+        <button
+          type="submit"
+          className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg py-3 text-xl shadow-md transition-all active:scale-95"
+          disabled={loading}
+        >
+          {loading ? 'Logging in...' : 'Log In'}
+        </button>
+      </form>
+      <div className="flex flex-col gap-2 mt-2 text-xs text-gray-600 items-center">
+        <span>Forgot your password? <button onClick={() => setShowForgotPassword(true)} className="text-blue-800 font-semibold hover:underline">Click here</button> to reset your password</span>
       </div>
-      <div className="relative">
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-400">
-          <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </span>
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="pl-12 pr-4 py-3 w-full bg-orange-50 border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 text-lg" />
-      </div>
-      {error && <div className="text-red-600 text-sm text-center">{error}</div>}
-      <button
-        type="submit"
-        className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg py-3 text-xl shadow-md transition-all active:scale-95"
-        disabled={loading}
-      >
-        {loading ? 'Logging in...' : 'Log In'}
-      </button>
-    </form>
+      <ForgotPasswordModal 
+        isOpen={showForgotPassword} 
+        onClose={() => setShowForgotPassword(false)} 
+      />
+    </>
   );
 };
 

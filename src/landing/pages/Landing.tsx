@@ -126,7 +126,6 @@ const Landing = () => {
               navigate('/pin', { state: { user: userData } });
             }} />
             <div className="flex flex-col gap-2 mt-2 text-xs text-gray-600 items-center">
-              <span>Forgot your password? <a href="#" className="text-blue-800 font-semibold hover:underline">Click here</a> to reset you password</span>
               <hr className="w-full border-gray-300 my-2" />
               <label className="flex items-center gap-2 mt-2">
                 <input 
