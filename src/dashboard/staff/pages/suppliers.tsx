@@ -4,7 +4,7 @@ import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Supplier, fetchSuppliers, addSupplier, updateSupplier, deleteSupplier } from '../../../models/supplierModel';
 import { FirestoreService } from '../../../services/firestoreService';
-import { fetchNotifications, Notification } from '../../../models/notificationModel';
+import { fetchNotifications } from '../../../models/notificationModel';
 
 const SUPPLIER_CATEGORIES = [
   { label: 'Food', icon: '🍔' },
@@ -31,7 +31,6 @@ const SuppliersPage = () => {
   const [form, setForm] = useState(emptySupplier);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   useEffect(() => { 
     const handleSnapshotError = (error: Error) => {
@@ -105,8 +104,7 @@ const SuppliersPage = () => {
         setSuccess(`Successfully deleted supplier "${supplierToDelete.name}"`);
         
         // Refresh notifications after successful deletion
-        const notifs = await fetchNotifications(user.email, user.branchId, false);
-        setNotifications(notifs);
+        await fetchNotifications(user.email, user.branchId, false);
       } else {
         setError('Failed to delete supplier. Please try again.');
       }
