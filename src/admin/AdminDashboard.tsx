@@ -192,6 +192,7 @@ export default function AdminDashboard() {
                 <label className="block text-sm font-medium">PIN</label>
                 <input type="password" value={newPin} onChange={e => setNewPin(e.target.value)} required maxLength={6} minLength={4} pattern="[0-9]*" inputMode="numeric" className="mt-1 block w-full border px-3 py-2 rounded" placeholder="Enter 4-6 digit PIN" />
               </div>
+              {newRole !== 'MANAGER' && (
               <div>
                 <label className="block text-sm font-medium">Shift</label>
                 <select
@@ -201,11 +202,12 @@ export default function AdminDashboard() {
                   className="mt-1 block w-full border px-3 py-2 rounded"
                 >
                   <option value="">Select shift</option>
-                  <option value="Morning">Morning</option>
-                  <option value="Afternoon">Afternoon</option>
-                  <option value="Night">Night</option>
+                  <option value="6am-2pm">6:00 AM - 2:00 PM</option>
+                  <option value="2pm-10pm">2:00 PM - 10:00 PM</option>
+                  <option value="10pm-6am">10:00 PM - 6:00 AM</option>
                 </select>
               </div>
+            )}
               <div>
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Create Account</button>
               </div>

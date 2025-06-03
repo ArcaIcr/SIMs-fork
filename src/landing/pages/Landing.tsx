@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo 1.png";
 import bg from "../../assets/bg.png";
 import LoginForm from '../components/LoginForm';
+import TermsModal from '../components/TermsModal';
 
 const AboutUsOverlay = ({ onClose }: { onClose: () => void }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
@@ -80,6 +81,8 @@ const Landing = () => {
   const navigate = useNavigate();
   const [showAbout, setShowAbout] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-center relative" style={{ backgroundImage: `url(${bg})` }}>
@@ -111,6 +114,10 @@ const Landing = () => {
           <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 flex flex-col gap-8 border-4 border-yellow-200">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Log in</h2>
             <LoginForm onSuccess={(user) => {
+              if (!termsAgreed) {
+                setShowTermsModal(true);
+                return;
+              }
               const userData = {
                 uid: user.uid,
                 email: user.email,
@@ -122,7 +129,12 @@ const Landing = () => {
               <span>Forgot your password? <a href="#" className="text-blue-800 font-semibold hover:underline">Click here</a> to reset you password</span>
               <hr className="w-full border-gray-300 my-2" />
               <label className="flex items-center gap-2 mt-2">
-                <input type="checkbox" className="accent-orange-500 w-4 h-4" />
+                <input 
+                  type="checkbox" 
+                  className="accent-orange-500 w-4 h-4" 
+                  checked={termsAgreed}
+                  onChange={(e) => setTermsAgreed(e.target.checked)}
+                />
                 <span>By continuing, you agree with our <button type="button" className="text-blue-800 font-semibold hover:underline focus:outline-none" onClick={() => setShowTerms(true)}>Terms and Conditions</button></span>
               </label>
             </div>
@@ -132,6 +144,14 @@ const Landing = () => {
       {/* Optionally, add a wooden table foreground here if image is available */}
       {showAbout && <AboutUsOverlay onClose={() => setShowAbout(false)} />}
       {showTerms && <TermsOverlay onClose={() => setShowTerms(false)} />}
+      <TermsModal 
+        open={showTermsModal} 
+        onAgree={() => {
+          setShowTermsModal(false);
+          setTermsAgreed(true);
+        }} 
+        onDisagree={() => setShowTermsModal(false)} 
+      />
     </div>
   );
 };
