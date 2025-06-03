@@ -59,6 +59,43 @@ export async function markAllNotificationsRead(branchId?: string) {
 }
 
 export async function clearNotifications(userId?: string, branchId?: string) {
-  const notifs = await fetchNotifications(userId, branchId);
-  await Promise.all(notifs.map((n: Notification) => FirestoreService.delete('notifications', n.id!)));
+  try {
+    console.log('Clearing notifications for:', { userId, branchId });
+    
+    if (!userId && !branchId) {
+      console.error('Cannot clear notifications: missing both userId and branchId');
+      return false;
+    }
+
+    const notifs = await fetchNotifications(userId, branchId);
+    console.log(`Found ${notifs.length} notifications to clear`);
+
+    if (notifs.length === 0) {
+      console.log('No notifications to clear');
+      return true;
+    }
+
+    const deletePromises = notifs.map(async (n) => {
+      if (!n.id) {
+        console.error('Notification missing ID:', n);
+        return false;
+      }
+      try {
+        await FirestoreService.delete('notifications', n.id);
+        return true;
+      } catch (error) {
+        console.error(`Failed to delete notification ${n.id}:`, error);
+        return false;
+      }
+    });
+
+    const results = await Promise.all(deletePromises);
+    const successCount = results.filter(Boolean).length;
+    console.log(`Successfully cleared ${successCount} of ${notifs.length} notifications`);
+
+    return successCount === notifs.length;
+  } catch (error) {
+    console.error('Error clearing notifications:', error);
+    return false;
+  }
 } 

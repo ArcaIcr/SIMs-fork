@@ -44,9 +44,19 @@ const StaffNavbar: React.FC<StaffNavbarProps> = ({ user }) => {
 
   const handleClearNotifications = async () => {
     if (!user?.branchId) return;
-    await clearNotifications(user.email, user.branchId);
-    const notifs = await fetchNotifications(user.email, user.branchId, false);
-    setNotifications(notifs);
+    try {
+      const success = await clearNotifications(user.email, user.branchId);
+      if (success) {
+        setNotifications([]);
+        console.log('All notifications cleared successfully');
+      } else {
+        console.error('Failed to clear some or all notifications');
+        // Optionally show an error message to the user
+      }
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+      // Optionally show an error message to the user
+    }
   };
 
   console.log('StaffNavbar user:', user);

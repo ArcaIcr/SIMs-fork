@@ -32,9 +32,19 @@ const ManagerNavbar: React.FC = () => {
   const handleCloseNotifications = () => setShowNotifications(false);
 
   const handleClearNotifications = async () => {
-    await clearNotifications(user?.email);
-    const notifs = await fetchNotifications(user?.email);
-    setNotifications(notifs);
+    try {
+      const success = await clearNotifications(user?.email, user?.branchId);
+      if (success) {
+        setNotifications([]);
+        console.log('All notifications cleared successfully');
+      } else {
+        console.error('Failed to clear some or all notifications');
+        // Optionally show an error message to the user
+      }
+    } catch (error) {
+      console.error('Error clearing notifications:', error);
+      // Optionally show an error message to the user
+    }
   };
 
   return (
