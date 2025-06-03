@@ -3,6 +3,8 @@ import StaffNavbar from '../components/StaffNavbar';
 import { useUser } from '../../../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Supplier, fetchSuppliers, addSupplier, updateSupplier, deleteSupplier } from '../../../models/supplierModel';
+import { FirestoreService } from '../../../services/firestoreService';
+import { fetchNotifications, Notification } from '../../../models/notificationModel';
 
 const SUPPLIER_CATEGORIES = [
   { label: 'Food', icon: '🍔' },
@@ -29,13 +31,15 @@ const SuppliersPage = () => {
   const [form, setForm] = useState(emptySupplier);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const docs = await fetchSuppliers();
-      setSuppliers(docs);
+  useEffect(() => { 
+    const handleSnapshotError = (error: Error) => {
+      console.error("Firestore snapshot error:", error);
+      setError(`Failed to fetch suppliers: ${error.message}`);
     };
-    fetchData();
+    const unsubscribe = FirestoreService.onSuppliersSnapshot(setSuppliers, handleSnapshotError);
+    return () => unsubscribe();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,19 +82,37 @@ const SuppliersPage = () => {
 
   const handleDelete = async (id: string) => {
     try {
+      // Validate user context
+      if (!user?.branchId || !user?.displayName || !user?.email) {
+        setError('User context is incomplete. Please try logging in again.');
+        return;
+      }
+
+      // Check if supplier still exists in our local state
+      const supplierToDelete = suppliers.find(s => s.id === id);
+      if (!supplierToDelete) {
+        setError('Supplier no longer exists or has been deleted.');
+        return;
+      }
+
       const success = await deleteSupplier(id, {
-        displayName: user?.displayName,
-        branchId: user?.branchId,
+        displayName: user.displayName,
+        branchId: user.branchId,
       });
+      
       if (success) {
-        const docs = await fetchSuppliers();
-        setSuppliers(docs);
-        setSuccess('Supplier deleted successfully!');
+        setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier.id !== id));
+        setSuccess(`Successfully deleted supplier "${supplierToDelete.name}"`);
+        
+        // Refresh notifications after successful deletion
+        const notifs = await fetchNotifications(user.email, user.branchId, false);
+        setNotifications(notifs);
       } else {
         setError('Failed to delete supplier. Please try again.');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      console.error('Error deleting supplier:', err);
+      setError('An error occurred while deleting the supplier. Please try again.');
     }
   };
 

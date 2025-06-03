@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import ManagerNavbar from '../components/ManagerNavbar';
 import { useNavigate } from 'react-router-dom';
 import { FirestoreService } from '../../../services/firestoreService';
+import { Supplier, deleteSupplier } from '../../../models/supplierModel';
+import { useUser } from '../../../context/UserContext';
 
 const SUPPLIER_CATEGORIES = [
   { label: 'Buns', icon: '🍔' },
@@ -13,19 +15,22 @@ const SUPPLIER_CATEGORIES = [
 const emptySupplier = { name: '', phone: '', email: '', address: '', category: SUPPLIER_CATEGORIES[0].label };
 
 const SuppliersPage = () => {
+  const { user } = useUser();
   const [selectedCategory, setSelectedCategory] = useState(SUPPLIER_CATEGORIES[0].label);
-  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
-  const [showEdit, setShowEdit] = useState<any>(null);
-  const [showRequest, setShowRequest] = useState<any>(null);
+  const [showEdit, setShowEdit] = useState<Supplier | null>(null);
+  const [showRequest, setShowRequest] = useState<Supplier | null>(null);
   const [form, setForm] = useState(emptySupplier);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSuppliers = async () => {
       setLoading(true);
-      const docs = await FirestoreService.getAll('suppliers');
+      const docs = await FirestoreService.getAll<Supplier>('suppliers');
       setSuppliers(docs);
       setLoading(false);
     };
@@ -37,23 +42,37 @@ const SuppliersPage = () => {
     await FirestoreService.create('suppliers', form);
     setShowAdd(false);
     setForm(emptySupplier);
-    const docs = await FirestoreService.getAll('suppliers');
+    const docs = await FirestoreService.getAll<Supplier>('suppliers');
     setSuppliers(docs);
   };
 
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!showEdit) return;
+    
     await FirestoreService.update('suppliers', showEdit.id, form);
     setShowEdit(null);
     setForm(emptySupplier);
-    const docs = await FirestoreService.getAll('suppliers');
+    const docs = await FirestoreService.getAll<Supplier>('suppliers');
     setSuppliers(docs);
   };
 
   const handleDelete = async (id: string) => {
-    await FirestoreService.delete('suppliers', id);
-    const docs = await FirestoreService.getAll('suppliers');
-    setSuppliers(docs);
+    try {
+      const success = await deleteSupplier(id, {
+        displayName: user?.displayName,
+        branchId: user?.branchId,
+      });
+      
+      if (success) {
+        setSuppliers(prevSuppliers => prevSuppliers.filter(supplier => supplier.id !== id));
+        setSuccess('Supplier deleted successfully!');
+      } else {
+        setError('Failed to delete supplier. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting the supplier.');
+    }
   };
 
   const selectedCat = SUPPLIER_CATEGORIES.find(cat => cat.label === selectedCategory);
@@ -125,6 +144,12 @@ const SuppliersPage = () => {
               ))}
             </div>
           </div>
+        )}
+        {error && (
+          <div className="text-red-500 mb-4">{error}</div>
+        )}
+        {success && (
+          <div className="text-green-500 mb-4">{success}</div>
         )}
       </div>
       {/* Add Supplier Modal */}

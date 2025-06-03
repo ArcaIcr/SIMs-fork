@@ -9,8 +9,10 @@ import {
   getDocs, 
   query,
   where,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { Supplier } from '../models/supplierModel';
 
 // Branch Interface
 export interface Branch {
@@ -145,15 +147,25 @@ export class FirestoreService {
   // Generic method to get a document by ID
   static async getById<T>(collectionName: string, documentId: string): Promise<T | null> {
     try {
+      console.log(`FirestoreService.getById: Attempting to fetch document from ${collectionName}/${documentId}`);
+      console.log(`Document ID type: ${typeof documentId}`);
+      
       const docRef = doc(db, collectionName, documentId);
+      console.log('Document reference created:', docRef);
+      
       const docSnap = await getDoc(docRef);
+      console.log('Document snapshot exists:', docSnap.exists());
       
       if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as T;
+        const data = { id: docSnap.id, ...docSnap.data() } as T;
+        console.log('Document data:', data);
+        return data;
       }
+      console.log('Document does not exist');
       return null;
     } catch (error) {
       console.error(`Error getting document from ${collectionName}:`, error);
+      console.error('Full error details:', error);
       return null;
     }
   }
@@ -183,12 +195,15 @@ export class FirestoreService {
 
   // Generic method to delete a document
   static async delete(collectionName: string, documentId: string): Promise<boolean> {
+    console.log(`FirestoreService: Attempting to delete document in collection ${collectionName} with ID ${documentId}`);
     try {
       const docRef = doc(db, collectionName, documentId);
+      console.log(`FirestoreService: Calling deleteDoc for document reference:`, docRef);
       await deleteDoc(docRef);
+      console.log(`FirestoreService: deleteDoc completed successfully for ID ${documentId}`);
       return true;
     } catch (error) {
-      console.error(`Error deleting document from ${collectionName}:`, error);
+      console.error(`FirestoreService: Error deleting document ${documentId} from ${collectionName}:`, error);
       return false;
     }
   }
@@ -198,7 +213,7 @@ export class FirestoreService {
     try {
       const q = query(collection(db, collectionName), where(field, operator, value));
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({ docId: doc.id, ...doc.data() } as T));
+      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
     } catch (error) {
       console.error(`Error querying ${collectionName}:`, error);
       return [];
@@ -252,5 +267,42 @@ export class FirestoreService {
       allSales.push({ date: dateDoc.id, products });
     }
     return allSales;
+  }
+
+  // Generic method to get all documents in a collection with real-time updates
+  static onCollectionSnapshot<T>(collectionName: string, onData: (data: T[]) => void, onError: (error: Error) => void) {
+    const collectionRef = collection(db, collectionName);
+    const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
+      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+      onData(docs);
+    }, (error) => {
+      console.error(`Error listening to ${collectionName} snapshot:`, error);
+      onError(error);
+    });
+    return unsubscribe;
+  }
+
+  // Specific snapshot listener for suppliers
+  static onSuppliersSnapshot(onData: (data: Supplier[]) => void, onError: (error: Error) => void) {
+    return this.onCollectionSnapshot<Supplier>('suppliers', onData, onError);
+  }
+
+  // Search suppliers by any field
+  static async searchSuppliers(field: string, value: any): Promise<Supplier[]> {
+    try {
+      console.log(`Searching suppliers where ${field} = ${value}`);
+      const suppliersCollection = collection(db, 'suppliers');
+      const q = query(suppliersCollection, where(field, '==', value));
+      const querySnapshot = await getDocs(q);
+      const results = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Supplier));
+      console.log(`Found ${results.length} matching suppliers:`, results);
+      return results;
+    } catch (error) {
+      console.error('Error searching suppliers:', error);
+      return [];
+    }
   }
 }
