@@ -5,9 +5,11 @@ import ForgotPasswordModal from './ForgotPasswordModal';
 
 interface LoginFormProps {
   onSuccess: (user: any) => void;
+  termsAgreed: boolean;
+  onShowTerms: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, termsAgreed, onShowTerms }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -17,6 +19,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!termsAgreed) {
+      setError('Please agree to the Terms and Conditions to log in.');
+      onShowTerms(); // Optionally show terms modal again
+      return;
+    }
+
     setLoading(true);
     try {
       let email = username;

@@ -114,17 +114,16 @@ const Landing = () => {
           <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-10 flex flex-col gap-8 border-4 border-yellow-200">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Log in</h2>
             <LoginForm onSuccess={(user) => {
-              if (!termsAgreed) {
-                setShowTermsModal(true);
-                return;
-              }
               const userData = {
                 uid: user.uid,
                 email: user.email,
                 displayName: user.displayName,
               };
               navigate('/pin', { state: { user: userData } });
-            }} />
+            }}
+            termsAgreed={termsAgreed}
+            onShowTerms={() => setShowTerms(true)}
+            />
             <div className="flex flex-col gap-2 mt-2 text-xs text-gray-600 items-center">
               <hr className="w-full border-gray-300 my-2" />
               <label className="flex items-center gap-2 mt-2">
